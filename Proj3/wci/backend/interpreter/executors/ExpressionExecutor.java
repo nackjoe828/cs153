@@ -1,0 +1,383 @@
+package wci.backend.interpreter.executors;
+
+import static wci.backend.interpreter.RuntimeErrorCode.DIVISION_BY_ZERO;
+import static wci.backend.interpreter.RuntimeErrorCode.INVALID_SET_ELEMENT_TYPE;
+import static wci.backend.interpreter.RuntimeErrorCode.SET_ELEMENT_VALUE_OUT_OF_RANGE;
+import static wci.intermediate.icodeimpl.ICodeKeyImpl.ID;
+import static wci.intermediate.icodeimpl.ICodeKeyImpl.VALUE;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.ADD;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.AND;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.FLOAT_DIVIDE;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.INTEGER_DIVIDE;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.IN_SET;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.MOD;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.MULTIPLY;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.OR;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.RANGE;
+import static wci.intermediate.icodeimpl.ICodeNodeTypeImpl.SUBTRACT;
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.DATA_VALUE;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+
+import wci.backend.interpreter.Executor;
+import wci.intermediate.ICodeNode;
+import wci.intermediate.SymTabEntry;
+import wci.intermediate.icodeimpl.ICodeNodeTypeImpl;
+
+/**
+ * <h1>ExpressionExecutor</h1>
+ *
+ * <p>Execute an expression.</p>
+ *
+ * <p>Copyright (c) 2009 by Ronald Mak</p>
+ * <p>For instructional purposes only.  No warranties.</p>
+ */
+public class ExpressionExecutor extends StatementExecutor
+{
+	//added
+	public static final int MIN_INT_VALUE_IN_SET = 0;
+	public static final int MAX_INT_VALUE_IN_SET = 50;
+
+    /**
+     * Constructor.
+     * @param the parent executor.
+     */
+    public ExpressionExecutor(Executor parent)
+    {
+        super(parent);
+    }
+
+    /**
+     * Execute an expression.
+     * @param node the root intermediate code node of the compound statement.
+     * @return the computed value of the expression.
+     */
+    public Object execute(ICodeNode node)
+    {
+        ICodeNodeTypeImpl nodeType = (ICodeNodeTypeImpl) node.getType();
+
+        switch (nodeType) {
+
+            case VARIABLE: {
+
+                // Get the variable's symbol table entry and return its value.
+                SymTabEntry entry = (SymTabEntry) node.getAttribute(ID);
+                return entry.getAttribute(DATA_VALUE);
+            }
+
+            case INTEGER_CONSTANT: {
+
+                // Return the integer value.
+                return (Integer) node.getAttribute(VALUE);
+            }
+
+            case REAL_CONSTANT: {
+
+                // Return the float value.
+                return (Float) node.getAttribute(VALUE);
+            }
+
+            case STRING_CONSTANT: {
+
+                // Return the string value.
+                return (String) node.getAttribute(VALUE);
+            }
+
+            case NEGATE: {
+
+                // Get the NEGATE node's expression node child.
+                ArrayList<ICodeNode> children = node.getChildren();
+                ICodeNode expressionNode = children.get(0);
+
+                // Execute the expression and return the negative of its value.
+                Object value = execute(expressionNode);
+                if (value instanceof Integer) {
+                    return -((Integer) value);
+                }
+                else {
+                    return -((Float) value);
+                }
+            }
+
+            case NOT: {
+
+                // Get the NOT node's expression node child.
+                ArrayList<ICodeNode> children = node.getChildren();
+                ICodeNode expressionNode = children.get(0);
+
+                // Execute the expression and return the "not" of its value.
+                boolean value = (Boolean) execute(expressionNode);
+                return !value;
+            }
+
+            //added
+            case SET: {
+				// Get the SET node's expression node child.
+				ArrayList<ICodeNode> children = node.getChildren();
+				// Execute the expression and return the set.
+				Set<Integer> setExp = new HashSet<Integer>();
+				for (ICodeNode iCodeNode : children) {
+					Object value = execute(iCodeNode);
+					if (value instanceof Integer) {
+						if (checkIntegerValueInSet((Integer) value, node)) {
+							setExp.add((Integer) value);
+						}
+					} else if (value instanceof ArrayList) {
+						@SuppressWarnings("unchecked")
+						ArrayList<Integer> intValues = (ArrayList<Integer>) value;
+						for (Integer i : intValues) {
+							if (checkIntegerValueInSet(i, node)) {
+								setExp.add(i);
+							}
+						}
+					} else {
+						errorHandler.flag(node, INVALID_SET_ELEMENT_TYPE, this);
+					}
+				}
+				return setExp;
+			}
+
+            // Must be a binary operator.
+            default: return executeBinaryOperator(node, nodeType);
+        }
+    }
+
+    // Set of arithmetic operator node types.
+    private static final EnumSet<ICodeNodeTypeImpl> ARITH_OPS =
+        EnumSet.of(ADD, SUBTRACT, MULTIPLY, FLOAT_DIVIDE, INTEGER_DIVIDE, MOD, RANGE);
+
+    /**
+     * Execute a binary operator.
+     * @param node the root node of the expression.
+     * @param nodeType the node type.
+     * @return the computed value of the expression.
+     */
+    private Object executeBinaryOperator(ICodeNode node,
+                                         ICodeNodeTypeImpl nodeType)
+    {
+        // Get the two operand children of the operator node.
+        ArrayList<ICodeNode> children = node.getChildren();
+        ICodeNode operandNode1 = children.get(0);
+        ICodeNode operandNode2 = children.get(1);
+
+        // Operands.
+        Object operand1 = execute(operandNode1);
+        Object operand2 = execute(operandNode2);
+
+        boolean integerMode = (operand1 instanceof Integer) &&
+                              (operand2 instanceof Integer);
+        
+        //added for set
+        boolean setMode = (operand1 instanceof Set) &&
+                           (operand2 instanceof Set);
+        
+        boolean inSetMode = (operand1 instanceof Integer) &&
+                             (operand2 instanceof Set);
+
+        // ====================
+        // Arithmetic operators
+        // ====================
+
+        if (ARITH_OPS.contains(nodeType)) {
+            if (integerMode) {
+                int value1 = (Integer) operand1;
+                int value2 = (Integer) operand2;
+
+                // Integer operations.
+                switch (nodeType) {
+                    case ADD:      return value1 + value2;
+                    case SUBTRACT: return value1 - value2;
+                    case MULTIPLY: return value1 * value2;
+                    
+                    //RANGE added for set
+                    case RANGE: {
+                    	ArrayList<Integer> range = new ArrayList<Integer>();
+                    	for(int i = value1; i<=value2;i++){
+                    		range.add(i);
+                    	}
+                    	return range;
+                    }
+                    	
+
+                    case FLOAT_DIVIDE: {
+
+                        // Check for division by zero.
+                        if (value2 != 0) {
+                            return ((float) value1)/((float) value2);
+                        }
+                        else {
+                            errorHandler.flag(node, DIVISION_BY_ZERO, this);
+                            return 0;
+                        }
+                    }
+
+                    case INTEGER_DIVIDE: {
+
+                        // Check for division by zero.
+                        if (value2 != 0) {
+                            return value1/value2;
+                        }
+                        else {
+                            errorHandler.flag(node, DIVISION_BY_ZERO, this);
+                            return 0;
+                        }
+                    }
+
+                    case MOD:  {
+
+                        // Check for division by zero.
+                        if (value2 != 0) {
+                            return value1%value2;
+                        }
+                        else {
+                            errorHandler.flag(node, DIVISION_BY_ZERO, this);
+                            return 0;
+                        }
+                    }
+                }
+            }
+            // added for set
+            else if (setMode) {
+				@SuppressWarnings("unchecked")
+				Set<Integer> set1 = (HashSet<Integer>) operand1;
+				@SuppressWarnings("unchecked")
+				Set<Integer> set2 = (HashSet<Integer>) operand2;
+				Set<Integer> setTmp = new HashSet<Integer>();
+
+				// set operations.
+				switch (nodeType) {
+				case ADD:
+					setTmp.addAll(set1);
+					setTmp.addAll(set2);
+					return setTmp;
+
+				case SUBTRACT:
+					setTmp.addAll(set1);
+					setTmp.removeAll(set2);
+					return setTmp;
+
+				case MULTIPLY:
+					setTmp.addAll(set1);
+					setTmp.retainAll(set2);
+					return setTmp;
+				}
+			}
+            else { // float operands
+                float value1 = operand1 instanceof Integer
+                                   ? (Integer) operand1 : (Float) operand1;
+                float value2 = operand2 instanceof Integer
+                                   ? (Integer) operand2 : (Float) operand2;
+
+                // Float operations.
+                switch (nodeType) {
+                    case ADD:      return value1 + value2;
+                    case SUBTRACT: return value1 - value2;
+                    case MULTIPLY: return value1 * value2;
+
+                    case FLOAT_DIVIDE: {
+
+                        // Check for division by zero.
+                        if (value2 != 0.0f) {
+                            return value1/value2;
+                        }
+                        else {
+                            errorHandler.flag(node, DIVISION_BY_ZERO, this);
+                            return 0.0f;
+                        }
+                    }
+                }
+            }
+        }
+
+        // ==========
+        // AND and OR
+        // ==========
+
+        else if ((nodeType == AND) || (nodeType == OR)) {
+            boolean value1 = (Boolean) operand1;
+            boolean value2 = (Boolean) operand2;
+
+            switch (nodeType) {
+                case AND: return value1 && value2;
+                case OR:  return value1 || value2;
+            }
+        }
+
+        // ====================
+        // Relational operators
+        // ====================
+
+        else if (integerMode) {
+            int value1 = (Integer) operand1;
+            int value2 = (Integer) operand2;
+
+            // Integer operands.
+            switch (nodeType) {
+                case EQ: return value1 == value2;
+                case NE: return value1 != value2;
+                case LT: return value1 <  value2;
+                case LE: return value1 <= value2;
+                case GT: return value1 >  value2;
+                case GE: return value1 >= value2;
+            }
+        }
+        //added for set
+        else if (inSetMode) {
+			@SuppressWarnings("unchecked")
+			Set<Integer> set = (HashSet<Integer>) operand2;
+			if (nodeType == IN_SET) {
+				Integer i = (Integer) operand1;
+				return set.contains(i);
+			}
+        }
+        else if (setMode) {
+			@SuppressWarnings("unchecked")
+			Set<Integer> set1 = (HashSet<Integer>) operand1;
+			@SuppressWarnings("unchecked")
+			Set<Integer> set2 = (HashSet<Integer>) operand2;
+
+			// set operations.
+			switch (nodeType) {
+			case EQ:
+				return set1.equals(set2);
+			case NE:
+				return !set1.equals(set2);
+			case LE:
+				return set2.containsAll(set1);
+			case GE:
+				return set1.containsAll(set2);
+			}
+        }
+        else {
+            float value1 = operand1 instanceof Integer
+                               ? (Integer) operand1 : (Float) operand1;
+            float value2 = operand2 instanceof Integer
+                               ? (Integer) operand2 : (Float) operand2;
+
+            // Float operands.
+            switch (nodeType) {
+                case EQ: return value1 == value2;
+                case NE: return value1 != value2;
+                case LT: return value1 <  value2;
+                case LE: return value1 <= value2;
+                case GT: return value1 >  value2;
+                case GE: return value1 >= value2;
+            }
+        }
+
+        return 0;  // should never get here
+    }
+
+    //added for set
+	private boolean checkIntegerValueInSet(int value, ICodeNode node) {
+		if ((value > MAX_INT_VALUE_IN_SET) || (value < MIN_INT_VALUE_IN_SET)) {
+			errorHandler.flag(node, SET_ELEMENT_VALUE_OUT_OF_RANGE, this);
+			return false;
+		}
+		return true;
+	}
+}
+
