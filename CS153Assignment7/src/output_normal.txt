@@ -1,0 +1,225 @@
+MAIN token: main
+LBRACE token: {
+CONSTANT token: CONSTANT
+COLON token: :
+IDENTIFIER token: co
+ASSIGN token: =
+TRUE token: true
+SEMICOLON token: ;
+IDENTIFIER token: pi
+ASSIGN token: =
+REAL token: 3.14
+SEMICOLON token: ;
+DECLARATION token: DECLARATION
+COLON token: :
+IDENTIFIER token: i
+COLON token: :
+INTEGER token: integer
+SEMICOLON token: ;
+IDENTIFIER token: c
+COLON token: :
+CHAR token: char
+SEMICOLON token: ;
+IDENTIFIER token: r
+COLON token: :
+REAL token: real
+SEMICOLON token: ;
+IDENTIFIER token: b
+COLON token: :
+BOOLEAN token: boolean
+SEMICOLON token: ;
+STATEMENT token: STATEMENT
+COLON token: :
+IDENTIFIER token: b
+Operand: b
+ASSIGN token: =
+IDENTIFIER token: co
+Operand: co
+SEMICOLON token: ;
+IDENTIFIER token: i
+Operand: i
+ASSIGN token: =
+INTNUM token: 10
+SEMICOLON token: ;
+IDENTIFIER token: r
+Operand: r
+ASSIGN token: =
+IDENTIFIER token: pi
+Operand: pi
+SEMICOLON token: ;
+WHILE token: while
+LPAREN token: (
+IDENTIFIER token: i
+Operand: i
+LE token: <=
+INTNUM token: 10
+RPAREN token: )
+LBRACE token: {
+IDENTIFIER token: i
+Operand: i
+ASSIGN token: =
+MINUS token: -
+IDENTIFIER token: i
+Operand: i
+PLUS token: +
+INTNUM token: 2
+STAR token: *
+LPAREN token: (
+INTNUM token: 3
+MINUS token: -
+LPAREN token: (
+IDENTIFIER token: i
+Operand: i
+PLUS token: +
+INTNUM token: 9
+RPAREN token: )
+RPAREN token: )
+SEMICOLON token: ;
+IDENTIFIER token: i
+Operand: i
+ASSIGN token: =
+IDENTIFIER token: i
+Operand: i
+PLUS token: +
+INTNUM token: 1
+SEMICOLON token: ;
+LBRACE token: }
+IF token: if
+LPAREN token: (
+TRUE token: true
+RPAREN token: )
+LBRACE token: {
+IDENTIFIER token: c
+Operand: c
+ASSIGN token: =
+CHARACTER token: 'a'
+SEMICOLON token: ;
+LBRACE token: }
+ELSE token: else
+LBRACE token: {
+IDENTIFIER token: c
+Operand: c
+ASSIGN token: =
+CHARACTER token: 'z'
+SEMICOLON token: ;
+LBRACE token: }
+RETURN token: return
+IDENTIFIER token: i
+Operand: i
+PLUS token: +
+IDENTIFIER token: c
+Operand: c
+SEMICOLON token: ;
+LBRACE token: }
+
+===== CROSS-REFERENCE TABLE =====
+
+*** PROGRAM main ***
+
+Identifier       Line numbers    Type specification
+----------       ------------    ------------------
+b                010 013
+                                 Defined as: variable
+                                 Scope nesting level: 1
+                                 Type form = enumeration, Type id = boolean
+c                008 023 026 029
+                                 Defined as: variable
+                                 Scope nesting level: 1
+                                 Type form = scalar, Type id = char
+co               003 013
+                                 Defined as: constant
+                                 Scope nesting level: 1
+                                 Type form = enumeration, Type id = boolean
+                                 Value = true
+i                007 014 017 018 018 018 019 019 029
+                                 Defined as: variable
+                                 Scope nesting level: 1
+                                 Type form = scalar, Type id = integer
+pi               004 015
+                                 Defined as: constant
+                                 Scope nesting level: 1
+                                 Type form = scalar, Type id = real
+                                 Value = 3.14
+r                009 015
+                                 Defined as: variable
+                                 Scope nesting level: 1
+                                 Type form = scalar, Type id = real
+
+===== INTERMEDIATE CODE =====
+
+*** PROGRAM main ***
+
+<BlockStatement>
+    <AssignmentStatement type_id="integer">
+        <Name id="b" level="1" type_id="boolean" />
+        <Name id="co" level="1" type_id="boolean" />
+    </AssignmentStatement>
+    <AssignmentStatement type_id="integer">
+        <Name id="i" level="1" type_id="integer" />
+        <Literal value="10" type_id="integer" />
+    </AssignmentStatement>
+    <AssignmentStatement type_id="real">
+        <Name id="r" level="1" type_id="real" />
+        <Name id="pi" level="1" type_id="real" />
+    </AssignmentStatement>
+    <ControlStatement>
+        <WhileStatement>
+            <lessEqual>
+                <Name id="i" level="1" type_id="integer" />
+                <Literal value="10" type_id="integer" />
+            </lessEqual>
+            <BlockStatement>
+                <AssignmentStatement type_id="integer">
+                    <plus type_id="integer">
+                        <negative>
+                            <Name id="i" level="1" type_id="integer" />
+                            <Name id="i" level="1" type_id="integer" />
+                        </negative>
+                        <multiply type_id="integer">
+                            <Literal value="2" type_id="integer" />
+                            <minus type_id="integer">
+                                <Literal value="3" type_id="integer" />
+                                <plus type_id="integer">
+                                    <Name id="i" level="1" type_id="integer" />
+                                    <Literal value="9" type_id="integer" />
+                                </plus>
+                            </minus>
+                        </multiply>
+                    </plus>
+                </AssignmentStatement>
+                <AssignmentStatement type_id="integer">
+                    <Name id="i" level="1" type_id="integer" />
+                    <plus type_id="integer">
+                        <Name id="i" level="1" type_id="integer" />
+                        <Literal value="1" type_id="integer" />
+                    </plus>
+                </AssignmentStatement>
+            </BlockStatement>
+        </WhileStatement>
+    </ControlStatement>
+    <ControlStatement>
+        <IfStatement>
+            <Literal value="true" type_id="boolean">
+                <BooleanLiteral />
+            </Literal>
+            <BlockStatement>
+                <AssignmentStatement type_id="integer">
+                    <Name id="c" level="1" type_id="char" />
+                    <Literal value="'a'" type_id="char" />
+                </AssignmentStatement>
+            </BlockStatement>
+            <BlockStatement>
+                <AssignmentStatement type_id="integer">
+                    <Name id="c" level="1" type_id="char" />
+                    <Literal value="'z'" type_id="char" />
+                </AssignmentStatement>
+            </BlockStatement>
+        </IfStatement>
+    </ControlStatement>
+    <ReturnStatement>
+        <plus type_id="integer">
+            <Name id="i" level="1" type_id="integer" />
+            <Name id="c" level="1" type_id="char" />
+        </plus>
+    </ReturnStatement>
+</BlockStatement>

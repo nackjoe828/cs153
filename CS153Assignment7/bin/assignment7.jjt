@@ -1,0 +1,497 @@
+options {
+  BUILD_PARSER=true;
+  IGNORE_CASE=false;
+  JJTREE_OUTPUT_DIRECTORY="teamAlumni/frontend";  
+  NODE_EXTENDS="wci.intermediate.icodeimpl.ICodeNodeImpl";  
+  DEBUG_TOKEN_MANAGER=false;
+  STATIC=false;
+  MULTI=true;
+  VISITOR=true;    
+}
+
+PARSER_BEGIN(Assignment7)
+package teamAlumni.frontend;
+
+import java.util.ArrayList;
+import java.io.*;
+
+import wci.intermediate.*;
+import wci.intermediate.symtabimpl.*;
+import wci.util.*;
+
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
+import static wci.intermediate.symtabimpl.DefinitionImpl.*;
+import static wci.intermediate.symtabimpl.RoutineCodeImpl.*;
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
+import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
+
+public class Assignment7
+{
+
+  private static SymTabStack symTabStack;
+  private static SymTabEntry programId;
+  
+  public static void main(String[] args) throws Exception
+  {
+	// Create and initialize the symbol table stack.
+    symTabStack = SymTabFactory.createSymTabStack();
+    Predefined.initialize(symTabStack);
+    
+    String path = args[0];
+    java.io.FileReader fr = new java.io.FileReader(path);
+    Assignment7 parser = new Assignment7(fr);
+
+    // Parse the program
+    SimpleNode rootNode  = parser.CompilationUnit();
+
+    // Print the cross-reference table.
+    CrossReferencer crossReferencer = new CrossReferencer();
+    crossReferencer.print(symTabStack);
+
+    // Visit the parse tree nodes to decorate them with type information.
+    TypeSetterVisitor typeVisitor = new TypeSetterVisitor();    rootNode.jjtAccept(typeVisitor, null);
+
+    // Create and initialize the ICode wrapper for the parse tree.
+    ICode iCode = ICodeFactory.createICode();
+    iCode.setRoot(rootNode);
+    programId.setAttribute(ROUTINE_ICODE, iCode);
+    
+    // Print the parse tree.
+    ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
+    treePrinter.print(symTabStack);    
+  } 
+}    
+PARSER_END(Assignment7)
+
+SKIP : {
+   " "
+   | "\t"
+   | "\n"
+   | "\r"
+   | <"//" (~["\n", "\r"])*("\n" | "\r" | "\r\n")>
+   | <"/*"(~["*"])*"*"(~["/"](~["*"])*"*")*"/" >
+ }
+
+/* RESERVED WORDS */
+TOKEN : {
+    <IF : "if">
+      { debugStream.println("IF token: " + matchedToken.image); }
+  | <BOOLEAN : "boolean">
+      { debugStream.println("BOOLEAN token: " + matchedToken.image); }  
+  | <REAL : "real">
+      { debugStream.println("REAL token: " + matchedToken.image); }
+  | <BREAK : "break">
+      { debugStream.println("BREAK token: " + matchedToken.image); }  
+  | <ELSE : "else">
+      { debugStream.println("ELSE token: " + matchedToken.image); }  
+  | <RETURN : "return">
+      { debugStream.println("RETURN token: " + matchedToken.image); }  
+  | <CASE : "case">
+      { debugStream.println("CASE token: " + matchedToken.image); }
+  | <INTEGER : "integer">
+      { debugStream.println("INTEGER token: " + matchedToken.image); }   
+  | <TRUE : "true">
+      { debugStream.println("TRUE token: " + matchedToken.image); }  
+  | <FALSE : "false">
+      { debugStream.println("FALSE token: " + matchedToken.image); }
+  | <CHAR : "char">
+      { debugStream.println("CHAR token: " + matchedToken.image); }
+  | <VOID : "void">
+      { debugStream.println("VOID token: " + matchedToken.image); }   
+  | <CONSTANT : "CONSTANT">
+      { debugStream.println("CONSTANT token: " + matchedToken.image); }  
+  | <SWITCH : "switch">
+      { debugStream.println("SWITCH token: " + matchedToken.image); }  
+  | <WHILE : "while">
+      { debugStream.println("WHILE token: " + matchedToken.image); }
+  | <CONTINUE : "continue">
+      { debugStream.println("CONTINUE token: " + matchedToken.image); }  
+  | <FOR : "for">
+      { debugStream.println("FOR token: " + matchedToken.image); }  
+  | <NULL : "null">
+      { debugStream.println("NULL token: " + matchedToken.image); }
+  | <FUNC_LIST : "FUNC_LIST">
+      { debugStream.println("FUNC_LIST token: " + matchedToken.image); }      
+  | <FUNC_DEF : "FUNC_DEF">
+      { debugStream.println("FUNC_DEF token: " + matchedToken.image); }
+  | <STATEMENT : "STATEMENT">
+      { debugStream.println("STATEMENT token: " + matchedToken.image); }
+  | <NEW_TYPE : "NEW_TYPE">
+      { debugStream.println("NEW_TYPE token: " + matchedToken.image); }
+  | <DECLARATION : "DECLARATION">
+      { debugStream.println("DECLARATION token: " + matchedToken.image); }
+  | <POINTER : "PTR">
+      { debugStream.println("POINTER token: " + matchedToken.image); }
+  | <MAIN : "main">
+      { debugStream.println("MAIN token: " + matchedToken.image); }
+  | <STRING : "string">
+      { debugStream.println("STRING token: " + matchedToken.image); }                                          
+}
+
+
+/* special symbol tokens */
+TOKEN : {
+    <STAR : "*">
+      { debugStream.println("STAR token: " + matchedToken.image); }  
+  | <MINUS : "-">
+      { debugStream.println("MINUS token: " + matchedToken.image); }
+  | <PLUS : "+">
+      { debugStream.println("PLUS token: " + matchedToken.image); }  
+  | <ASSIGN : "=">
+      { debugStream.println("ASSIGN token: " + matchedToken.image); }  
+  | <SLASH : "/">
+      { debugStream.println("SLASH token: " + matchedToken.image); }
+  | <COLON : ":">
+      { debugStream.println("COLON token: " + matchedToken.image); } 
+  | <SEMICOLON : ";">
+      { debugStream.println("SEMICOLON token: " + matchedToken.image); } 
+  | <HOOK : "?">
+      { debugStream.println("HOOK token: " + matchedToken.image); }
+  | <LT : "<">
+      { debugStream.println("LT token: " + matchedToken.image); }  
+  | <GT : ">">
+      { debugStream.println("GT token: " + matchedToken.image); }  
+  | <DOT : ".">
+      { debugStream.println("DOT token: " + matchedToken.image); } 
+  | <COMMA : ",">
+      { debugStream.println("COMMA token: " + matchedToken.image); }
+  | <SINGLEQUOTE : "'">
+      { debugStream.println("SINGLEQUOTE token: " + matchedToken.image); }  
+  | <QUOTE : "\"">
+      { debugStream.println("QUOTE token: " + matchedToken.image); }  
+  | <LPAREN : "(">
+      { debugStream.println("LPAREN token: " + matchedToken.image); } 
+  | <RPAREN : ")">
+      { debugStream.println("RPAREN token: " + matchedToken.image); } 
+  | <LBRACE: "{">
+      { debugStream.println("LBRACE token: " + matchedToken.image); }
+  | <RBRACE: "}">
+      { debugStream.println("LBRACE token: " + matchedToken.image); }    
+  | <LE : "<=">
+      { debugStream.println("LE token: " + matchedToken.image); }  
+  | <GE : ">=">
+      { debugStream.println("GE token: " + matchedToken.image); }  
+  | <EQ : "==">
+      { debugStream.println("EQ token: " + matchedToken.image); }  
+  | <NE : "!=">
+      { debugStream.println("NE token: " + matchedToken.image); } 
+}
+
+  
+/* IDENTIFIER tokens */
+TOKEN : {
+	<IDENTIFIER : (<LETTER> | "_") (<LETTER> | <DIGIT> | "_")*>
+      { debugStream.println("IDENTIFIER token: " + matchedToken.image); }
+  | <#DIGIT  : ["0"-"9"]>
+  | <#LETTER : ["A"-"Z"] | ["a"-"z"]>
+  
+}
+
+/* CHARACTER tokens */
+TOKEN :
+{
+  <CHARACTER : <SINGLEQUOTE>(<LETTER>|<SYMBAL>|<DIGIT>)<SINGLEQUOTE>>
+      { debugStream.println("CHARACTER token: " + matchedToken.image); }
+    | <#SYMBAL  : ~ ["A"-"Z","a"-"z","0"-"9"]>
+}
+
+
+/* INTEGER number tokens */
+TOKEN :
+{
+    <INTNUM : <DIGITWITHOUTZERO>(<DIGIT>)*>
+      { debugStream.println("INTNUM token: " + matchedToken.image); }
+  | <#DIGITWITHOUTZERO : ["1"-"9"] >
+}
+
+/* REAL number tokens */
+TOKEN : {
+    <REALNUM : (<DIGIT>)+<DOT>(<FRACTION>)*((<EXPSIGN>)?(<OPTSIGN>)?(<DIGIT>)+)?
+    		  |(<DIGIT>)*<DOT>(<FRACTION>)+(<EXPSIGN>)?(<OPTSIGN>)?(<DIGIT>)*
+    		  |(<DIGIT>)+(<EXPSIGN>)(<OPTSIGN>)?(<DIGIT>)+>
+      { debugStream.println("REAL token: " + matchedToken.image); }
+   | <#FRACTION : ["0"-"9"]>
+   | <#EXPSIGN : ["e","E"]>
+   | <#OPTSIGN : ["+","-"]>
+}
+
+TOKEN : {
+  <ERROR : ~[";"]>
+}
+
+/*****************************************
+ * THE LANGUAGE GRAMMAR STARTS HERE *
+ *****************************************/
+SimpleNode CompilationUnit():{  SimpleNode rootNode;}{  try  {
+    "main"    {      programId = symTabStack.enterLocal("main");      programId.setDefinition(DefinitionImpl.PROGRAM);      programId.setAttribute(ROUTINE_SYMTAB, symTabStack.push());      symTabStack.setProgramId(programId);    }
+    "{"    [ Constant() ]
+    [ NewType() ]
+    [ FunctionList() ]
+    [ FunctionDefinition() ]
+    rootNode = DeclAndStat() 
+    "}"
+    < EOF >    {      return rootNode;    }  }  catch (ParseException ex)  {
+    System.out.println("================big: " + ex);    handleError(ex.currentToken);    return null;  }}
+
+void Constant():
+{SimpleNode node;}
+{
+  "CONSTANT" ":"
+  (<IDENTIFIER>
+  {    SymTabEntry constantId = symTabStack.lookupLocal(token.image);    if (constantId == null) {       constantId = symTabStack.enterLocal(token.image);       constantId.appendLineNumber(token.beginLine);       constantId.setDefinition(DefinitionImpl.CONSTANT);    }  }
+  "="
+  node = ConstantLiteral()  {    constantId.setAttribute(CONSTANT_VALUE, node.getAttribute(VALUE));        constantId.setTypeSpec(node.getTypeSpec());  }
+  ";")*
+}
+
+void NewType():
+{}
+{
+  "NEW_TYPE" ":"
+  (NewTypeDefinition())*
+}
+
+void NewTypeDefinition():
+{}
+{
+  "{" (VariableDeclaration() ";")+ "}" ":" <IDENTIFIER>
+}
+
+void FunctionList():
+{}
+{
+  "FUNC_LIST" ":"  
+  (FunctionDeclaration() ";")+
+}
+
+void FunctionDeclaration():
+{}
+{
+  <IDENTIFIER>{
+    SymTabEntry funcId = symTabStack.enterLocal(token.image);
+    funcId.setDefinition(DefinitionImpl.FUNCTION);  }
+  "(" [ FuncVariableDeclaration(funcId) ("," FuncVariableDeclaration(funcId))* ] ")"
+  ":" (Type()  {
+    //funcId.setTypeSpec();  }|"void")
+}
+
+void FuncVariableDeclaration(SymTabEntry funcId):
+{VariableDecl varDecl = new VariableDecl();}
+{
+  <IDENTIFIER>{
+    varDecl.setName(token.image);
+  }
+  ":" Type(){
+    //varDecl.setType();
+    funcId.setAttribute(SymTabKeyImpl.ROUTINE_PARMS, varDecl);
+  }
+}
+
+void Type():
+{}
+{
+  <CHAR> | <INTEGER> | <REAL> | <BOOLEAN> | <IDENTIFIER>
+}
+
+void FunctionDefinition():
+{}
+{
+  "FUNC_DEF" ":"
+  (Function())+
+}
+
+void Function():
+{}
+{
+  <IDENTIFIER>
+  "{"
+  DeclAndStat()
+  "}"
+}
+
+SimpleNode DeclAndStat():
+{SimpleNode rootNode;}
+{
+  ["DECLARATION" ":" (VariableDeclaration() ";")*]
+  "STATEMENT" ":" rootNode = BlockStatement(){
+    return rootNode;
+  }
+}
+
+void VariableDeclaration():
+{}
+{
+  <IDENTIFIER>{    SymTabEntry variableId = symTabStack.enterLocal(token.image);
+    variableId.setDefinition(DefinitionImpl.VARIABLE);
+    variableId.appendLineNumber(token.beginLine);
+  }
+  ":" Type(){
+    SymTabEntry typeId = symTabStack.lookup(token.image);    typeId.appendLineNumber(token.beginLine);    TypeSpec type = typeId.getTypeSpec();
+    variableId.setTypeSpec(type);  }
+}
+
+//use embedded definite node descriptors
+void Expression() #void :
+{}
+{
+  AdditiveExpression()
+  [ "<" AdditiveExpression() #lessThan(2)
+  | "<=" AdditiveExpression() #lessEqual(2)
+  | ">" AdditiveExpression() #greaterThan(2)
+  | ">=" AdditiveExpression() #greaterEqual(2)
+  | "==" AdditiveExpression() #equal(2)
+  | "!=" AdditiveExpression() #notEqual(2) ]
+}
+
+void AdditiveExpression() #void : 
+{}
+{
+  MultiplicativeExpression()
+  ( "+" MultiplicativeExpression() #plus(2)
+  | "-" MultiplicativeExpression() #minus(2) )*
+}
+
+void MultiplicativeExpression() #void :{}{
+  UnaryExpression()  ( "*" UnaryExpression() #multiply(2)    | "/" UnaryExpression() #divide(2) )*}
+
+void UnaryExpression() #void :
+{}
+{
+  "+" UnaryExpression() #positive(2)
+  | "-" UnaryExpression() #negative(2)
+  | Literal()
+  | Name()
+  | "(" Expression() ")"
+}
+
+SimpleNode ConstantLiteral():
+{}
+{
+  < INTNUM >{
+    jjtThis.setTypeSpec(Predefined.integerType);
+    jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));
+    return jjtThis;
+  }
+  | < REALNUM >{
+    jjtThis.setTypeSpec(Predefined.realType);
+    jjtThis.setAttribute(VALUE, Float.parseFloat(token.image));
+    return jjtThis;
+  }
+  | < CHARACTER >{
+    jjtThis.setTypeSpec(Predefined.charType);
+    jjtThis.setAttribute(VALUE, token.image);
+    return jjtThis;
+  }
+  | BooleanLiteral(){
+    jjtThis.setTypeSpec(Predefined.booleanType);
+    jjtThis.setAttribute(VALUE, Boolean.parseBoolean(token.image));
+    return jjtThis;
+  }
+}
+
+void Literal():
+{}
+{
+  < INTNUM >{    jjtThis.setTypeSpec(Predefined.integerType);    jjtThis.setAttribute(VALUE, Integer.parseInt(token.image));  }  | < REALNUM >{    jjtThis.setTypeSpec(Predefined.realType);    jjtThis.setAttribute(VALUE, Float.parseFloat(token.image));  }  | < CHARACTER >{    jjtThis.setTypeSpec(Predefined.charType);    jjtThis.setAttribute(VALUE, token.image);  }
+  | BooleanLiteral(){    jjtThis.setTypeSpec(Predefined.booleanType);
+    jjtThis.setAttribute(VALUE, Boolean.parseBoolean(token.image));
+  }
+}
+
+void BooleanLiteral() :
+{}
+{
+  "true" | "false"
+}
+
+SimpleNode Name() :{}{  < IDENTIFIER >  //  ("." <IDENTIFIER>)*
+  {    System.out.println("Operand: " + token.image);    SymTabEntry variableId = symTabStack.lookup(token.image);    if (variableId == null)    {      handleError(token);
+      return null;    }    else    {      variableId.appendLineNumber(token.beginLine);      TypeSpec type = variableId.getTypeSpec();      jjtThis.setTypeSpec(type);      jjtThis.setAttribute(ID, variableId);
+      return jjtThis;    }  }}
+
+void Statement() #void :
+{SimpleNode stmtNode;}
+{
+  Block()
+  | stmtNode=AssignmentStatement()  {
+    if (stmtNode == null)    {		jjtree.popNode();
+    }  }
+  | ControlStatement()
+  | ReturnStatement()
+  | Error()  {	handleError(token);
+  }
+}
+
+void Block() #void :
+{}
+{
+  "{" BlockStatement() "}"
+}
+
+SimpleNode BlockStatement():
+{}
+{
+  ( Statement() )*
+  {return jjtThis;}
+}
+
+SimpleNode AssignmentStatement():
+{SimpleNode nameNode;}
+{
+  nameNode=Name()
+  {	if (nameNode == null)	{	  return null;
+	}
+  }
+  ("=" | Error() { handleError(token); })
+  Expression()
+  ";"
+  {    return jjtThis;
+  }
+}
+
+void ControlStatement():
+{}
+{
+  IfStatement() | WhileStatement()
+}
+
+void IfStatement():
+{}
+{
+  "if" "(" Expression() ")" Statement() [ LOOKAHEAD(1) "else" Statement() ]
+}
+
+void WhileStatement():
+{}
+{
+  "while" "(" Expression() ")" Statement()
+}
+
+void ReturnStatement():
+{}
+{
+  "return" [ Expression() ] ";"  
+}
+
+void Error() : {}
+{
+  <ERROR>
+}
+
+JAVACODE
+String handleError(Token token) #void
+{
+  System.out.println("*** ERROR: Line " + token.beginLine +
+                     " after \"" + token.image + "\"" + " ***");
+  
+  Token t;
+  
+  do {
+    t = getNextToken();
+  } while (t.kind != SEMICOLON);
+
+  Node removedNode = jjtree.popNode();
+  System.out.println("handleError: poped node is " + removedNode);
+  System.out.println("handleError: after popNode, the head node is " + jjtree.peekNode());
+  return t.image;
+}

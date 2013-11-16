@@ -1,0 +1,34 @@
+main{
+CONSTANT:
+co = true;
+pi = 3.14;
+
+DECLARATION:
+i:integer;
+c:char;
+r:real;
+b:boolean;
+
+STATEMENT:
+b = co;
+i = 10;
+r = pi;
+
+zz = r;  // error: zz is not declared.
+
+% = 3;   // error: % is invalid
+
+while (i <= 10) {
+i = i + 2*(3-(i+9));
+i = i+1;
+}
+
+if(true){
+c = 'a';
+}
+else{
+c = 'z';
+}
+
+retun i+c;   // error: typo: retun
+}
