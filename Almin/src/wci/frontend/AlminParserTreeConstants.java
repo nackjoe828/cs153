@@ -23,8 +23,9 @@ public interface AlminParserTreeConstants
   public int JJTMULT = 17;
   public int JJTDIV = 18;
   public int JJTAND = 19;
-  public int JJTLITERAL = 20;
-  public int JJTVARIABLE = 21;
+  public int JJTSTRINGLITERAL = 20;
+  public int JJTLITERAL = 21;
+  public int JJTVARIABLE = 22;
 
 
   public String[] jjtNodeName = {
@@ -48,8 +49,9 @@ public interface AlminParserTreeConstants
     "mult",
     "div",
     "and",
+    "StringLiteral",
     "Literal",
     "Variable",
   };
 }
-/* JavaCC - OriginalChecksum=37f3896f1c5f4ff356bbdecb381d8648 (do not edit this line) */
+/* JavaCC - OriginalChecksum=c0844a05a3b918672d747d988e9dab53 (do not edit this line) */

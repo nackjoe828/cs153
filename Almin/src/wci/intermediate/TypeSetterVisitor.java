@@ -8,6 +8,7 @@ import wci.frontend.ASTLT;
 import wci.frontend.ASTLiteral;
 import wci.frontend.ASTNE;
 import wci.frontend.ASTReturnStatement;
+import wci.frontend.ASTStringLiteral;
 import wci.frontend.ASTVariable;
 import wci.frontend.ASTadd;
 import wci.frontend.ASTand;
@@ -133,6 +134,11 @@ public class TypeSetterVisitor extends AlminParserVisitorAdapter
 
 	@Override
 	public Object visit(ASTVariable node, Object data) {
+		return data;
+	}
+	
+	@Override
+	public Object visit(ASTStringLiteral node, Object data) {
 		return data;
 	}
 }

@@ -23,7 +23,8 @@ public interface AlminParserVisitor
   public Object visit(ASTmult node, Object data);
   public Object visit(ASTdiv node, Object data);
   public Object visit(ASTand node, Object data);
+  public Object visit(ASTStringLiteral node, Object data);
   public Object visit(ASTLiteral node, Object data);
   public Object visit(ASTVariable node, Object data);
 }
-/* JavaCC - OriginalChecksum=87c081734be5b1342b635b97dbc4df79 (do not edit this line) */
+/* JavaCC - OriginalChecksum=4a66897b53df0315867f315f3ecd5ed5 (do not edit this line) */

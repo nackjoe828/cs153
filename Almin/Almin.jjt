@@ -134,7 +134,7 @@ TOKEN : {
   | <DOT         : ".">
   | <COMMA       : ",">
   | <SINGLEQUOTE : "'">
-  | <QUOTE       : "\"">
+  | <DOUBLEQUOTE : "\"">
   | <LPAREN      : "(">
   | <RPAREN      : ")">
   | <LBRACE      : "{">
@@ -161,6 +161,18 @@ TOKEN : {
 TOKEN :
 {
   <CHAR : <SINGLEQUOTE> (<LETTER>|<DIGIT>) <SINGLEQUOTE>>
+}
+
+/* STRING tokens */
+TOKEN :
+{
+  <STRING :
+    <DOUBLEQUOTE> 
+    (
+      (~["\"", "\\", "\n", "\r"]) |
+      ( ("\\" ( ["n","t","b","r","f","\\","\'","\""] )))    )*
+    <DOUBLEQUOTE>
+  >
 }
 
 /* BOOL token*/
@@ -301,7 +313,7 @@ SimpleNode Statements() : {}
 void Statement() #void : {}
 {
   LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  AssignmentStatement() | FunctionCall() | Block() | ControlStatement() |  ReturnStatement()
+  AssignmentStatement() | FunctionCall() ";" | Block() | ControlStatement() |  ReturnStatement()
 }
 
 void AssignmentStatement() : {}{
@@ -331,7 +343,7 @@ void FunctionCall() : {}
     jjtThis.setTypeSpec(type);
     jjtThis.setAttribute(ID, funcID);
   }
-   "(" [Expression() ("," Expression())*] ")" ";"}
+   "(" [Expression() ("," Expression())*] ")"}
 
 void ReturnStatement() : {}
 {
@@ -340,6 +352,7 @@ void ReturnStatement() : {}
 
 void Expression() #void : {}
 {
+  StringLiteral() |
   SimpleExpression()   [ <LT> SimpleExpression() #LT(2)
                        | <LE> SimpleExpression() #LE(2)
                        | <GT> SimpleExpression() #GT(2)
@@ -368,9 +381,13 @@ void Term() #void : {}
 void Factor() #void : {}
 {
   LOOKAHEAD(2) // Variable and FunctionCall both start with <IDENTIFIER>
-  Variable() | FunctionCall() | Literal() | "(" Expression() ")" | <NOT> Factor() | "-" Factor()
+  FunctionCall() | Variable() | Literal() | "(" Expression() ")" | <NOT> Factor() | "-" Factor()
 }
 
+void StringLiteral() : {}{
+  <STRING> {
+        jjtThis.setTypeSpec(Predefined.stringType);
+        jjtThis.setAttribute(VALUE, token.image.substring(1, token.image.length()-1));  }}
 void Literal() : {}
 {
   <INT> {

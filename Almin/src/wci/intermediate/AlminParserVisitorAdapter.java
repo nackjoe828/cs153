@@ -17,6 +17,7 @@ import wci.frontend.ASTReturnStatement;
 import wci.frontend.ASTSimpleExpression;
 import wci.frontend.ASTStatement;
 import wci.frontend.ASTStatements;
+import wci.frontend.ASTStringLiteral;
 import wci.frontend.ASTTerm;
 import wci.frontend.ASTVariable;
 import wci.frontend.ASTWhileStatement;
@@ -139,6 +140,11 @@ public class AlminParserVisitorAdapter implements AlminParserVisitor
 
 	@Override
 	public Object visit(ASTVariable node, Object data) {
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTStringLiteral node, Object data) {
 		return node.childrenAccept(this, data);
 	}
 

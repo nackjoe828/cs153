@@ -138,7 +138,7 @@ TOKEN : {
   | <DOT         : ".">
   | <COMMA       : ",">
   | <SINGLEQUOTE : "'">
-  | <QUOTE       : "\"">
+  | <DOUBLEQUOTE : "\"">
   | <LPAREN      : "(">
   | <RPAREN      : ")">
   | <LBRACE      : "{">
@@ -165,6 +165,18 @@ TOKEN : {
 TOKEN :
 {
   <CHAR : <SINGLEQUOTE> (<LETTER>|<DIGIT>) <SINGLEQUOTE>>
+}
+
+/* STRING tokens */
+TOKEN :
+{
+  <STRING :
+    <DOUBLEQUOTE> 
+    (
+      (~["\"", "\\", "\n", "\r"]) |
+      ( ("\\" ( ["n","t","b","r","f","\\","\'","\""] )))    )*
+    <DOUBLEQUOTE>
+  >
 }
 
 /* BOOL token*/
@@ -367,7 +379,7 @@ SimpleNode Statements() : {/*@bgen(jjtree) Statements */
 void Statement()       : {}
 {
   LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  AssignmentStatement() | FunctionCall() | Block() | ControlStatement() |  ReturnStatement()
+  AssignmentStatement() | FunctionCall() ";" | Block() | ControlStatement() |  ReturnStatement()
 }
 
 void AssignmentStatement() : {/*@bgen(jjtree) AssignmentStatement */
@@ -481,7 +493,7 @@ void FunctionCall() : {/*@bgen(jjtree) FunctionCall */
     jjtn000.setTypeSpec(type);
     jjtn000.setAttribute(ID, funcID);
   }
-   "(" [Expression() ("," Expression())*] ")" ";"/*@bgen(jjtree)*/
+   "(" [Expression() ("," Expression())*] ")"/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -536,6 +548,7 @@ void ReturnStatement() : {/*@bgen(jjtree) ReturnStatement */
 
 void Expression()       : {}
 {
+  StringLiteral() |
   SimpleExpression()   [ <LT>/*@bgen(jjtree) #LT( 2) */
                               {
                                 ASTLT jjtn001 = new ASTLT(JJTLT);
@@ -888,9 +901,30 @@ void Term()       : {}
 void Factor()       : {}
 {
   LOOKAHEAD(2) // Variable and FunctionCall both start with <IDENTIFIER>
-  Variable() | FunctionCall() | Literal() | "(" Expression() ")" | <NOT> Factor() | "-" Factor()
+  FunctionCall() | Variable() | Literal() | "(" Expression() ")" | <NOT> Factor() | "-" Factor()
 }
 
+void StringLiteral() : {/*@bgen(jjtree) StringLiteral */
+  ASTStringLiteral jjtn000 = new ASTStringLiteral(JJTSTRINGLITERAL);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}{/*@bgen(jjtree) StringLiteral */
+  try {
+/*@egen*/
+  <STRING>/*@bgen(jjtree)*/
+           {
+             jjtree.closeNodeScope(jjtn000, true);
+             jjtc000 = false;
+           }
+/*@egen*/ {
+        jjtn000.setTypeSpec(Predefined.stringType);
+        jjtn000.setAttribute(VALUE, token.image.substring(1, token.image.length()-1));  }/*@bgen(jjtree)*/
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/}
 void Literal() : {/*@bgen(jjtree) Literal */
   ASTLiteral jjtn000 = new ASTLiteral(JJTLITERAL);
   boolean jjtc000 = true;

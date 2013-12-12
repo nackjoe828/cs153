@@ -3,7 +3,7 @@ void proc1() {
 }
 
 // pow computes b^exp
-void pow(real b, int exp) {
+real pow(real b, int exp) {
 DECLARATION:
 	int i;
 	real ret;
@@ -24,8 +24,13 @@ DECLARATION:
 STATEMENT:
 	b = 0.0;
 	exp = 0;
-	while (exp < 10) {
-		pow(b, exp);
+	while (exp < 10) 
+	{
+	DECLARATION:
+		real ans;
+	STATEMENT:
+		ans = pow(b, exp);
+		printf("%f^%d = %f", b, exp, ans);
 		exp=exp+1;
 	}
 }

@@ -59,7 +59,7 @@ public interface AlminParserConstants {
   /** RegularExpression Id. */
   int SINGLEQUOTE = 26;
   /** RegularExpression Id. */
-  int QUOTE = 27;
+  int DOUBLEQUOTE = 27;
   /** RegularExpression Id. */
   int LPAREN = 28;
   /** RegularExpression Id. */
@@ -91,21 +91,23 @@ public interface AlminParserConstants {
   /** RegularExpression Id. */
   int CHAR = 42;
   /** RegularExpression Id. */
-  int BOOL = 43;
+  int STRING = 43;
   /** RegularExpression Id. */
-  int INT = 44;
+  int BOOL = 44;
   /** RegularExpression Id. */
-  int REAL = 45;
+  int INT = 45;
   /** RegularExpression Id. */
-  int SIGN = 46;
+  int REAL = 46;
   /** RegularExpression Id. */
-  int UNSIGNED = 47;
+  int SIGN = 47;
   /** RegularExpression Id. */
-  int WHOLE = 48;
+  int UNSIGNED = 48;
   /** RegularExpression Id. */
-  int FRACTION = 49;
+  int WHOLE = 49;
   /** RegularExpression Id. */
-  int EXPONENT = 50;
+  int FRACTION = 50;
+  /** RegularExpression Id. */
+  int EXPONENT = 51;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -157,6 +159,7 @@ public interface AlminParserConstants {
     "<DIGIT>",
     "<LETTER>",
     "<CHAR>",
+    "<STRING>",
     "<BOOL>",
     "<INT>",
     "<REAL>",

@@ -28,6 +28,7 @@ public class Predefined
     public static TypeSpec realType;
     public static TypeSpec booleanType;
     public static TypeSpec charType;
+    public static TypeSpec stringType;
     public static TypeSpec voidType;
     public static TypeSpec undefinedType;
 
@@ -36,6 +37,7 @@ public class Predefined
     public static SymTabEntry realId;
     public static SymTabEntry booleanId;
     public static SymTabEntry charId;
+    public static SymTabEntry stringId;
     public static SymTabEntry voidId;
     public static SymTabEntry falseId;
     public static SymTabEntry trueId;
@@ -106,6 +108,13 @@ public class Predefined
         charId.setDefinition(DefinitionImpl.TYPE);
         charId.setTypeSpec(charType);
         
+        // Type char.
+        stringId = symTabStack.enterLocal("string");
+        stringType = TypeFactory.createType(SCALAR);
+        stringType.setIdentifier(stringId);
+        stringId.setDefinition(DefinitionImpl.TYPE);
+        stringId.setTypeSpec(stringType);
+        
         // Type void.
         voidId = symTabStack.enterLocal("void");
         voidType = TypeFactory.createType(SCALAR);
@@ -150,7 +159,7 @@ public class Predefined
     {
 /*        readId    = enterStandard(symTabStack, PROCEDURE, "read",    READ);
         readlnId  = enterStandard(symTabStack, PROCEDURE, "readln",  READLN);*/
-        printfId   = enterStandard(symTabStack, PROCEDURE, "print",   PRINTF);
+        printfId   = enterStandard(symTabStack, PROCEDURE, "printf",   PRINTF);
 
 /*
         absId    = enterStandard(symTabStack, FUNCTION, "abs",    ABS);
