@@ -1,0 +1,430 @@
+/* Team Aluminium (Yu-Chi Li, George McBay, Jianqi Wang, Naoko Nakatani)
+ * Almin Compiler
+ * Fall 2013
+ */
+
+options {
+	DEBUG_PARSER = true;
+    IGNORE_CASE=false;
+    JJTREE_OUTPUT_DIRECTORY="src/wci/frontend";
+    NODE_EXTENDS="wci.intermediate.icodeimpl.ICodeNodeImpl";
+    MULTI=true;
+    VISITOR=true;
+}
+
+PARSER_BEGIN(AlminParser)
+package wci.frontend;
+
+import java.util.ArrayList;
+import java.io.*;
+
+import wci.intermediate.*;
+import wci.intermediate.symtabimpl.*;
+import wci.backend.*;
+import wci.util.*;
+
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
+import static wci.intermediate.symtabimpl.DefinitionImpl.*;
+import static wci.intermediate.symtabimpl.RoutineCodeImpl.*;
+import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
+import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
+
+import java.io.*;
+
+public class AlminParser
+{
+  private static final String SOURCE_SUFFIX = ".al";
+  private static final String OUTPUT_SUFFIX = ".j";
+
+  private static SymTabStack symTabStack;
+  private static SymTabEntry programId;
+  
+  public static void main(String[] args)
+  {    
+    // Create and initialize the symbol table stack.
+    symTabStack = SymTabFactory.createSymTabStack();
+    Predefined.initialize(symTabStack);
+    
+    // Check if the input format is valid 
+    if (args.length != 1 || !args[0].endsWith(SOURCE_SUFFIX)) {
+      System.out.println("Usage: > Almin inputfile.al");
+      return;
+    }
+
+    String filePath = args[0];
+    
+    // Create parser from source
+    FileReader fr = null;
+    try {
+      fr = new java.io.FileReader(filePath);
+    } catch (FileNotFoundException e) {
+      System.out.println("Error: \"" + filePath + "\" does not exist");    }
+
+    // Get the file name without the ".al" suffix 
+    String name = filePath.substring(0, filePath.lastIndexOf(SOURCE_SUFFIX));
+    // Get the file name without Path and suffix (i.e. path/to/filename.al ===> filename)
+	String programName = name.substring(name.lastIndexOf("/")+1);
+    
+    AlminParser parser = new AlminParser(fr);
+    SimpleNode rootNode = null;
+    
+    try {
+      rootNode = parser.Program(programName);
+    } 
+    catch (ParseException ex) {
+      ex.printStackTrace();
+    }
+    
+    // Print the cross-reference table.
+    CrossReferencer crossReferencer = new CrossReferencer();
+    crossReferencer.print(symTabStack);
+
+    // Visit the parse tree nodes to decorate them with type information.
+    TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
+    rootNode.jjtAccept(typeVisitor, null);
+
+    // Create and initialize the ICode wrapper for the parse tree.
+    ICode iCode = ICodeFactory.createICode();
+    iCode.setRoot(rootNode);
+    programId.setAttribute(ROUTINE_ICODE, iCode);
+        
+    // Print the parse tree.
+    ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
+    treePrinter.print(symTabStack); 
+  } 
+}    
+PARSER_END(AlminParser)
+
+SKIP : {
+    < SPACE  : [" ", "\t"] >
+  | < EOL    : ["\n", "\r"] > 
+  | < SINGLE_LINE_COMMENT :   "//" (~["\n", "\r"])* (<EOL>)? >
+  | < GENERAL_COMMENT : "/*" > : COMMENT_STATE
+ }
+
+<COMMENT_STATE> SKIP:
+{
+  <"*/"> : DEFAULT
+ | < ~[] >
+}
+
+/* RESERVED WORDS */
+TOKEN : {
+    <MAIN        : "main">
+  | <STATEMENT   : "STATEMENT">
+  | <DECLARATION : "DECLARATION">
+  | <IF          : "if">
+  | <ELSE        : "else">
+  | <WHILE       : "while">
+  | <RETURN      : "return">                    
+}
+
+/* special symbol tokens */
+TOKEN : {
+    <STAR        : "*">
+  | <MINUS       : "-">
+  | <PLUS        : "+">  
+  | <ASSIGN      : "="> 
+  | <SLASH       : "/">
+  | <COLON       : ":"> 
+  | <SEMICOLON   : ";">
+  | <HOOK        : "?">
+  | <LT          : "<"> 
+  | <GT          : ">"> 
+  | <DOT         : ".">
+  | <COMMA       : ",">
+  | <SINGLEQUOTE : "'">
+  | <QUOTE       : "\"">
+  | <LPAREN      : "(">
+  | <RPAREN      : ")">
+  | <LBRACE      : "{">
+  | <RBRACE      : "}">   
+  | <LE          : "<="> 
+  | <GE          : ">=">  
+  | <EQ          : "==">
+  | <NE          : "!=">
+  | <AND         : "&&">
+  | <OR          : "||">
+  | <NOT         : "!">
+}
+
+  
+/* IDENTIFIER tokens */
+TOKEN : {
+   <IDENTIFIER : (<LETTER> | "_") (<LETTER> | <DIGIT> | "_")*>
+  | <#DIGIT  : ["0"-"9"]>
+  | <#LETTER : ["A"-"Z"] | ["a"-"z"]>
+  
+}
+
+/* CHAR tokens */
+TOKEN :
+{
+  <CHAR : <SINGLEQUOTE> (<LETTER>|<DIGIT>) <SINGLEQUOTE>>
+}
+
+/* BOOL token*/
+TOKEN :
+{
+  <BOOL : "true" | "false">}
+
+/* Number value tokens */
+TOKEN :
+{
+    <INT         : <UNSIGNED>>
+  | <REAL        : <WHOLE><FRACTION><EXPONENT>
+                 | <WHOLE><FRACTION>
+                 | <WHOLE><EXPONENT>>
+
+  | <#SIGN       : <PLUS>|<MINUS>>
+
+  | <#UNSIGNED   : (<DIGIT>)+>
+  | <#WHOLE      : <UNSIGNED>>
+  | <#FRACTION   : <DOT><UNSIGNED>>
+  | <#EXPONENT   : "E" (<SIGN>)? <UNSIGNED>>
+}
+
+
+/*****************************************
+ * ALMIN GRAMMAR STARTS HERE             *
+ *****************************************/
+SimpleNode Program(String programName) #void :
+{
+  // Set program name; Enter global scope (push on symTabStack)
+  SimpleNode rootNode;
+  programId = symTabStack.enterLocal(programName);
+  programId.setDefinition(DefinitionImpl.PROGRAM);
+  symTabStack.setProgramId(programId);
+  programId.setAttribute(ROUTINE_SYMTAB, symTabStack.push());
+  programId.setAttribute(ROUTINE_ROUTINES, new ArrayList<SymTabEntry>());
+}
+{
+  rootNode = FunctionDefinitions()
+  <EOF>
+  {
+    symTabStack.pop();
+    return rootNode;
+  }
+}
+
+SimpleNode FunctionDefinitions() #void :
+{
+  SimpleNode rootNode;
+}
+{
+  (FuncDefn())*
+  rootNode = ProgramMain()
+  { return rootNode; }
+}
+
+SimpleNode ProgramMain() #void :
+{
+  SimpleNode rootNode;
+}
+{
+  <MAIN> // push new scope for main()
+  {
+    SymTabEntry mainID = symTabStack.enterLocal("main");
+    mainID.setDefinition(DefinitionImpl.PROCEDURE);
+	mainID.appendLineNumber(token.beginLine);
+    mainID.setAttribute(ROUTINE_SYMTAB, symTabStack.push());
+  }
+  rootNode = Block()
+  {
+    ICode iCode = ICodeFactory.createICode();
+    iCode.setRoot(rootNode);
+    mainID.setAttribute(ROUTINE_ICODE, iCode);
+    symTabStack.pop();
+    return rootNode;
+  }}
+
+void FuncDefn()  #void :
+{
+  TypeSpec type;
+  SymTabEntry funcID;
+  ArrayList<SymTabEntry> paramList;
+  SimpleNode bodyNode;
+}
+{
+   // Return Type
+  <IDENTIFIER> { type = javaCodeGetAndProcessTypeID(token); }
+  // Function name
+  <IDENTIFIER> { funcID = javaCodeProcessFuncDefn(token, type); }
+  
+  "(" // Parameters  {
+    funcID.setAttribute(ROUTINE_SYMTAB, symTabStack.push());
+    ArrayList<SymTabEntry> routineIds =
+    	(ArrayList<SymTabEntry>) programId.getAttribute(ROUTINE_ROUTINES);
+    routineIds.add(funcID);
+    paramList = new ArrayList<SymTabEntry>();  }
+       [<IDENTIFIER> { type = javaCodeGetAndProcessTypeID(token); }
+        <IDENTIFIER> { paramList.add(javaCodeProcessVariableDeclaration(token, type)); }
+       ("," <IDENTIFIER> { type = javaCodeGetAndProcessTypeID(token); }
+            <IDENTIFIER> { paramList.add(javaCodeProcessVariableDeclaration(token, type));})*
+      ]
+  ")"
+  { funcID.setAttribute(ROUTINE_PARMS, paramList); }
+  bodyNode = Block()
+  {
+    ICode iCode = ICodeFactory.createICode();
+    iCode.setRoot(bodyNode);
+    funcID.setAttribute(ROUTINE_ICODE, iCode);
+    symTabStack.pop();
+  }
+}
+
+SimpleNode Block() :
+{ SimpleNode rootNode; }
+{
+  "{"
+      [<DECLARATION > ":" (VariableDeclaration())*
+      <STATEMENT> ":"]
+      rootNode = Statements()
+  "}"
+  { return rootNode ;}
+}
+
+void VariableDeclaration()  #void :
+{ TypeSpec type; }
+{
+  <IDENTIFIER> { type = javaCodeGetAndProcessTypeID(token); }
+  <IDENTIFIER> { javaCodeProcessVariableDeclaration(token, type); }
+  ";"
+}
+
+SimpleNode Statements() : {}
+{
+  (Statement())*
+  { return jjtThis;}
+}
+
+void Statement() #void : {}
+{
+  LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
+  AssignmentStatement() | FunctionCall() | Block() | ControlStatement() |  ReturnStatement()
+}
+
+void AssignmentStatement() : {}{
+  Variable() "=" Expression() ";"}
+
+void ControlStatement() #void : {}
+{
+  IfStatement() | WhileStatement()
+}
+
+void IfStatement() : {} {
+  <IF> "(" Expression() ")" Statement()
+  // nothing wrong - suppress warning by adding LOOKAHEAD(1)
+  [LOOKAHEAD(1) <ELSE> Statement()] 
+}
+
+void WhileStatement() : {}
+{
+  <WHILE> "(" Expression() ")" Statement()     }
+
+void FunctionCall() : {}
+{
+  <IDENTIFIER> {
+    SymTabEntry funcID = symTabStack.lookup(token.image);
+  	funcID.appendLineNumber(token.beginLine);
+    TypeSpec type = funcID.getTypeSpec();
+    jjtThis.setTypeSpec(type);
+    jjtThis.setAttribute(ID, funcID);
+  }
+   "(" [Expression() ("," Expression())*] ")" ";"}
+
+void ReturnStatement() : {}
+{
+  <RETURN> [ Expression() ] ";"
+}
+
+void Expression() #void : {}
+{
+  SimpleExpression()   [ <LT> SimpleExpression() #LT(2)
+                       | <LE> SimpleExpression() #LE(2)
+                       | <GT> SimpleExpression() #GT(2)
+                       | <GE> SimpleExpression() #GE(2)
+                       | <EQ> SimpleExpression() #EQ(2)
+                       | <NE> SimpleExpression() #NE(2)
+                       ]
+}
+
+void SimpleExpression() #void : {}
+{
+  Term() ( "+"  Term() #add(2)
+         | "-"  Term() #sub(2)
+         | <OR> Term() #or(2)
+         )*
+}
+
+void Term() #void : {}
+{
+  Factor() ( "*"   Factor() #mult(2)
+           | "/"   Factor() #div(2)
+           | <AND> Factor() #and(2)
+           )*
+}
+
+void Factor() #void : {}
+{
+  LOOKAHEAD(2) // Variable and FunctionCall both start with <IDENTIFIER>
+  Variable() | FunctionCall() | Literal() | "(" Expression() ")" | <NOT> Factor() | "-" Factor()
+}
+
+void Literal() : {}
+{
+  <INT> {
+        jjtThis.setTypeSpec(Predefined.integerType);
+        jjtThis.setAttribute(VALUE, Integer.parseInt(token.image)); 
+  } |
+  <REAL> {
+        jjtThis.setTypeSpec(Predefined.realType);
+        jjtThis.setAttribute(VALUE, Double.parseDouble(token.image)); 
+  } |
+  <CHAR> {
+        jjtThis.setTypeSpec(Predefined.charType);
+        jjtThis.setAttribute(VALUE, token.image.charAt(1)); 
+  } |
+  <BOOL> {
+        jjtThis.setTypeSpec(Predefined.booleanType);
+        jjtThis.setAttribute(VALUE, Boolean.valueOf(token.image)); 
+  }
+}
+
+void Variable() : {}
+{
+  <IDENTIFIER> {
+    SymTabEntry variableId = symTabStack.lookup(token.image);
+  	variableId.appendLineNumber(token.beginLine);
+    TypeSpec type = variableId.getTypeSpec();
+    jjtThis.setTypeSpec(type);
+    jjtThis.setAttribute(ID, variableId);
+  }
+}
+
+JAVACODE
+TypeSpec javaCodeGetAndProcessTypeID(Token t) #void
+{
+    SymTabEntry typeID = symTabStack.lookup(t.image);
+    typeID.appendLineNumber(t.beginLine);
+    return typeID.getTypeSpec(); 
+}
+
+JAVACODE
+SymTabEntry javaCodeProcessFuncDefn(Token t, TypeSpec type) #void
+{    SymTabEntry funcID = symTabStack.enterLocal(t.image);
+    funcID.setDefinition(DefinitionImpl.FUNCTION);
+    funcID.appendLineNumber(t.beginLine);
+    funcID.setTypeSpec(type); // set return type
+    return funcID;
+}
+
+JAVACODE
+SymTabEntry javaCodeProcessVariableDeclaration(Token t, TypeSpec type) #void
+{
+    SymTabEntry varID = symTabStack.enterLocal(t.image);
+    varID.setDefinition(DefinitionImpl.VARIABLE);
+    varID.appendLineNumber(t.beginLine);
+    varID.setTypeSpec(type); // set return type
+    return varID;
+}
