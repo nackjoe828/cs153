@@ -5,7 +5,7 @@ void proc1() {
 // pow computes b^exp
 real pow(real b, int exp) {
 DECLARATION:
-	int i;
+	int k;
 	real ret;
 STATEMENT:
 	i = 0;
