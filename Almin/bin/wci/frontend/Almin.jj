@@ -63,6 +63,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants/*@e
       fr = new java.io.FileReader(filePath);
     } catch (FileNotFoundException e) {
       System.out.println("Error: \"" + filePath + "\" does not exist");
+      return;
     }
 
     // Get the file name without the ".al" suffix 
@@ -404,7 +405,7 @@ void Assignment()           : {/*@bgen(jjtree) ASSIGN */
 
 void ControlStatement()       : {}
 {
-  IfStatement() | WhileLoop() | ForLoop()
+  IfStatement() | WhileLoop()// | ForLoop()
 }
 
 void IfStatement() : {/*@bgen(jjtree) IfStatement */
@@ -468,42 +469,15 @@ void WhileLoop()        : {/*@bgen(jjtree) LOOP */
     }
   }
 /*@egen*/     }
-
-void ForLoop()        : {ICodeNode node; int count = 2;}{
+/*
+void ForLoop() # void : {ICodeNode node; int count = 2;}{
   <FOR> "("
   [Expression() ("," Expression())*]";"
   BooleanExpression() ";"
   [Expression() {count++;} ("," Expression())* {count++;}]
-  ")"/*@bgen(jjtree) LOOP */
-  {
-    ASTLOOP jjtn001 = new ASTLOOP(JJTLOOP);
-    boolean jjtc001 = true;
-    jjtree.openNodeScope(jjtn001);
-  }
-  try {
-/*@egen*/
-  Statement()/*@bgen(jjtree)*/
-  } catch (Throwable jjte001) {
-    if (jjtc001) {
-      jjtree.clearNodeScope(jjtn001);
-      jjtc001 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte001 instanceof RuntimeException) {
-      throw (RuntimeException)jjte001;
-    }
-    if (jjte001 instanceof ParseException) {
-      throw (ParseException)jjte001;
-    }
-    throw (Error)jjte001;
-  } finally {
-    if (jjtc001) {
-      jjtree.closeNodeScope(jjtn001, true);
-    }
-  }
-/*@egen*/        //{ jjtThis.addChild(node); }}
-
+  ")"
+  Statement() #LOOP  //{ jjtThis.addChild(node); }}
+*/
 void FunctionCall() : {/*@bgen(jjtree) FunctionCall */
   ASTFunctionCall jjtn000 = new ASTFunctionCall(JJTFUNCTIONCALL);
   boolean jjtc000 = true;
@@ -1021,6 +995,9 @@ void Variable() : {/*@bgen(jjtree) Variable */
                }
 /*@egen*/ {
     SymTabEntry variableId = symTabStack.lookup(token.image);
+    if (variableId == null) {
+		System.out.println("Error: variable of name: \"" + token.image + "\" has not been defined at line");
+    }
   	variableId.appendLineNumber(token.beginLine);
     TypeSpec type = variableId.getTypeSpec();
     jjtn000.setTypeSpec(type);
