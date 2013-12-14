@@ -44,6 +44,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
       fr = new java.io.FileReader(filePath);
     } catch (FileNotFoundException e) {
       System.out.println("Error: \u005c"" + filePath + "\u005c" does not exist");
+      return;
     }
 
     // Get the file name without the ".al" suffix 
@@ -310,7 +311,6 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case IF:
         case WHILE:
-        case FOR:
         case RETURN:
         case SEMICOLON:
         case LBRACE:
@@ -345,7 +345,6 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           break;
         case IF:
         case WHILE:
-        case FOR:
           ControlStatement();
           break;
         case RETURN:
@@ -409,9 +408,6 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
         break;
       case WHILE:
         WhileLoop();
-        break;
-      case FOR:
-        ForLoop();
         break;
       default:
         jj_la1[7] = jj_gen;
@@ -506,105 +502,15 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     }
   }
 
-  static final public void ForLoop() throws ParseException {
-    trace_call("ForLoop");
-    try {
-                         ICodeNode node; int count = 2;
-      jj_consume_token(FOR);
-      jj_consume_token(LPAREN);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case MINUS:
-      case LPAREN:
-      case NOT:
-      case IDENTIFIER:
-      case CHAR:
-      case STRING:
-      case BOOL:
-      case INT:
-      case REAL:
-        Expression();
-        label_5:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case COMMA:
-            ;
-            break;
-          default:
-            jj_la1[9] = jj_gen;
-            break label_5;
-          }
-          jj_consume_token(COMMA);
-          Expression();
-        }
-        break;
-      default:
-        jj_la1[10] = jj_gen;
-        ;
-      }
-      jj_consume_token(SEMICOLON);
-      BooleanExpression();
-      jj_consume_token(SEMICOLON);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case MINUS:
-      case LPAREN:
-      case NOT:
-      case IDENTIFIER:
-      case CHAR:
-      case STRING:
-      case BOOL:
-      case INT:
-      case REAL:
-        Expression();
-                 count++;
-        label_6:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case COMMA:
-            ;
-            break;
-          default:
-            jj_la1[11] = jj_gen;
-            break label_6;
-          }
-          jj_consume_token(COMMA);
-          Expression();
-        }
-                                                count++;
-        break;
-      default:
-        jj_la1[12] = jj_gen;
-        ;
-      }
-      jj_consume_token(RPAREN);
-    ASTLOOP jjtn001 = new ASTLOOP(JJTLOOP);
-    boolean jjtc001 = true;
-    jjtree.openNodeScope(jjtn001);
-      try {
-        Statement();
-      } catch (Throwable jjte001) {
-    if (jjtc001) {
-      jjtree.clearNodeScope(jjtn001);
-      jjtc001 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte001 instanceof RuntimeException) {
-      {if (true) throw (RuntimeException)jjte001;}
-    }
-    if (jjte001 instanceof ParseException) {
-      {if (true) throw (ParseException)jjte001;}
-    }
-    {if (true) throw (Error)jjte001;}
-      } finally {
-    if (jjtc001) {
-      jjtree.closeNodeScope(jjtn001, true);
-    }
-      }
-    } finally {
-      trace_return("ForLoop");
-    }
-  }
-
+/*
+void ForLoop() # void : {ICodeNode node; int count = 2;}{
+  <FOR> "("
+  [Expression() ("," Expression())*]";"
+  BooleanExpression() ";"
+  [Expression() {count++;} ("," Expression())* {count++;}]
+  ")"
+  Statement() #LOOP  //{ jjtThis.addChild(node); }}
+*/
   static final public void FunctionCall() throws ParseException {
     trace_call("FunctionCall");
     try {
@@ -631,22 +537,22 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
         case INT:
         case REAL:
           Expression();
-          label_7:
+          label_5:
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
             case COMMA:
               ;
               break;
             default:
-              jj_la1[13] = jj_gen;
-              break label_7;
+              jj_la1[9] = jj_gen;
+              break label_5;
             }
             jj_consume_token(COMMA);
             Expression();
           }
           break;
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[10] = jj_gen;
           ;
         }
         jj_consume_token(RPAREN);
@@ -696,7 +602,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           Expression();
           break;
         default:
-          jj_la1[15] = jj_gen;
+          jj_la1[11] = jj_gen;
           ;
         }
         jj_consume_token(SEMICOLON);
@@ -732,7 +638,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
         StringLiteral();
         break;
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[12] = jj_gen;
         if (jj_2_2(2)) {
           Assignment();
         } else {
@@ -748,7 +654,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
             BooleanExpression();
             break;
           default:
-            jj_la1[17] = jj_gen;
+            jj_la1[13] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -934,13 +840,13 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           }
           break;
         default:
-          jj_la1[18] = jj_gen;
+          jj_la1[14] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         break;
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[15] = jj_gen;
         ;
       }
     } finally {
@@ -952,7 +858,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     trace_call("SimpleExpression");
     try {
       Term();
-      label_8:
+      label_6:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case MINUS:
@@ -961,8 +867,8 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           ;
           break;
         default:
-          jj_la1[20] = jj_gen;
-          break label_8;
+          jj_la1[16] = jj_gen;
+          break label_6;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case PLUS:
@@ -1047,7 +953,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           }
           break;
         default:
-          jj_la1[21] = jj_gen;
+          jj_la1[17] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1061,7 +967,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     trace_call("Term");
     try {
       Factor();
-      label_9:
+      label_7:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STAR:
@@ -1070,8 +976,8 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           ;
           break;
         default:
-          jj_la1[22] = jj_gen;
-          break label_9;
+          jj_la1[18] = jj_gen;
+          break label_7;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STAR:
@@ -1156,7 +1062,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           }
           break;
         default:
-          jj_la1[23] = jj_gen;
+          jj_la1[19] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1196,7 +1102,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           Factor();
           break;
         default:
-          jj_la1[24] = jj_gen;
+          jj_la1[20] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1267,7 +1173,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
         jjtn000.setAttribute(VALUE, Boolean.valueOf(token.image));
           break;
         default:
-          jj_la1[25] = jj_gen;
+          jj_la1[21] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1293,6 +1199,9 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
                  jjtree.closeNodeScope(jjtn000, true);
                  jjtc000 = false;
     SymTabEntry variableId = symTabStack.lookup(token.image);
+    if (variableId == null) {
+                System.out.println("Error: variable of name: \u005c"" + token.image + "\u005c" has not been defined at line");
+    }
         variableId.appendLineNumber(token.beginLine);
     TypeSpec type = variableId.getTypeSpec();
     jjtn000.setTypeSpec(type);
@@ -1365,33 +1274,33 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     finally { jj_save(2, xla); }
   }
 
-  static private boolean jj_3R_12() {
+  static private boolean jj_3R_10() {
     if (jj_scan_token(IDENTIFIER)) return true;
     return false;
   }
 
   static private boolean jj_3_3() {
-    if (jj_3R_11()) return true;
+    if (jj_3R_9()) return true;
     return false;
   }
 
   static private boolean jj_3_1() {
-    if (jj_3R_10()) return true;
+    if (jj_3R_8()) return true;
     return false;
   }
 
   static private boolean jj_3_2() {
-    if (jj_3R_10()) return true;
+    if (jj_3R_8()) return true;
     return false;
   }
 
-  static private boolean jj_3R_10() {
-    if (jj_3R_12()) return true;
+  static private boolean jj_3R_8() {
+    if (jj_3R_10()) return true;
     if (jj_scan_token(ASSIGN)) return true;
     return false;
   }
 
-  static private boolean jj_3R_11() {
+  static private boolean jj_3R_9() {
     if (jj_scan_token(IDENTIFIER)) return true;
     if (jj_scan_token(LPAREN)) return true;
     return false;
@@ -1409,7 +1318,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[26];
+  static final private int[] jj_la1 = new int[22];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1417,10 +1326,10 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x4000000,0x0,0x0,0x200,0x80207400,0x80207400,0x3400,0x800,0x4000000,0x20010000,0x4000000,0x20010000,0x4000000,0x20010000,0x20010000,0x0,0x20010000,0x1800000,0x1800000,0x30000,0x30000,0x88000,0x88000,0x20010000,0x0,};
+      jj_la1_0 = new int[] {0x0,0x4000000,0x0,0x0,0x200,0x80205400,0x80205400,0x1400,0x800,0x4000000,0x20010000,0x20010000,0x0,0x20010000,0x1800000,0x1800000,0x30000,0x30000,0x88000,0x88000,0x20010000,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x100,0x0,0x100,0x100,0x0,0x100,0x100,0x0,0x0,0x0,0xf980,0x0,0xf980,0x0,0xf980,0xf980,0x1000,0xe980,0x1e,0x1e,0x40,0x40,0x20,0x20,0xe980,0xe800,};
+      jj_la1_1 = new int[] {0x100,0x0,0x100,0x100,0x0,0x100,0x100,0x0,0x0,0x0,0xf980,0xf980,0x1000,0xe980,0x1e,0x1e,0x40,0x40,0x20,0x20,0xe980,0xe800,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[3];
   static private boolean jj_rescan = false;
@@ -1444,7 +1353,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1460,7 +1369,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1478,7 +1387,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1490,7 +1399,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1507,7 +1416,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1518,7 +1427,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1637,7 +1546,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < 22; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

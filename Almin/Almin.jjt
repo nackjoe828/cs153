@@ -344,7 +344,7 @@ void Assignment()  # ASSIGN : {}{
 
 void ControlStatement() #void : {}
 {
-  IfStatement() | WhileLoop() | ForLoop()
+  IfStatement() | WhileLoop()// | ForLoop()
 }
 
 void IfStatement() : {} {
@@ -446,6 +446,9 @@ void Variable() : {}
 {
   <IDENTIFIER> {
     SymTabEntry variableId = symTabStack.lookup(token.image);
+    if (variableId == null) {
+		System.out.println("Error: variable of name: \"" + token.image + "\" has not been defined at line");
+    }
   	variableId.appendLineNumber(token.beginLine);
     TypeSpec type = variableId.getTypeSpec();
     jjtThis.setTypeSpec(type);

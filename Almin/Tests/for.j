@@ -23,6 +23,7 @@
     getstatic For/i I
     ldc 1
     iadd
+L003:
     getstatic For/j I
     ldc 10
     getstatic For/j I
@@ -31,10 +32,3 @@
     ldc 1
     getstatic For/j I
     getstatic For/i I
-
-
-    return
-
-.limit locals 4
-.limit stack  16
-.end method
