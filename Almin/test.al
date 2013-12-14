@@ -33,6 +33,8 @@ STATEMENT:
 		printf("%f^%d = %f", b, exp, ans);
 		exp=exp+1;
 	}
+	if (exp == 0)
+		exp == 4;
 }
 
 
