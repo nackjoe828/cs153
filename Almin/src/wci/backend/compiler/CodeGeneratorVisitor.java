@@ -3,7 +3,6 @@ package wci.backend.compiler;
 import wci.frontend.*;
 import wci.intermediate.*;
 import wci.intermediate.symtabimpl.Predefined;
-
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
 
 public class CodeGeneratorVisitor
@@ -250,7 +249,6 @@ public class CodeGeneratorVisitor
     
     public Object visit(ASTIfStatement node, Object data){
     	SimpleNode conditionNode = (SimpleNode) node.jjtGetChild(0);
-    	SimpleNode trueNode = (SimpleNode) node.jjtGetChild(1);
     	
     	conditionNode.jjtAccept(this, data);
     	//store the label number before being incremented
@@ -260,11 +258,22 @@ public class CodeGeneratorVisitor
     	CodeGenerator.objectFile.println("    goto L" + String.format("%03d", ++labelCount));
     	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
     	CodeGenerator.objectFile.println("    iconst_1");
-    	CodeGenerator.objectFile.println("L" + String.format("%03d", ++labelCount) + ":");
+    	CodeGenerator.objectFile.println("L" + String.format("%03d", labelCount) + ":");
     	CodeGenerator.objectFile.println("    ifeq L" + String.format("%03d", ++labelCount));
     	storedNumber = labelCount;
     	
-    	trueNode.jjtAccept(this, data);
+    	// execute if block
+    	SimpleNode ifBlockNode = (SimpleNode) node.jjtGetChild(1);
+    	ifBlockNode.jjtAccept(this, data);
+    	
+    	// if else block follows, execute
+    	if(node.jjtGetNumChildren() == 3){
+    		CodeGenerator.objectFile.println("    goto L" + String.format("%03d", ++labelCount) + ":");
+    		CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
+    		storedNumber = labelCount;
+    		SimpleNode elseBlockNode = (SimpleNode) node.jjtGetChild(2);
+    		elseBlockNode.jjtAccept(this, data);
+    	}
     	
     	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
     	CodeGenerator.objectFile.flush();
