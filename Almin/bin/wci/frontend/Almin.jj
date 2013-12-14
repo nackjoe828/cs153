@@ -310,14 +310,14 @@ SimpleNode Block() :
   "{"
       [<DECLARATION > ":" (VariableDeclaration())*
       <STATEMENT> ":"]
-      rootNode = Statements()
+      Statements()
   "}"/*@bgen(jjtree)*/
   {
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
   }
 /*@egen*/
-  { return rootNode ;}/*@bgen(jjtree)*/
+  { return jjtn000 ;}/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -360,41 +360,10 @@ void VariableDeclaration()        :
   ";"
 }
 
-SimpleNode Statements() : {/*@bgen(jjtree) Statements */
-  ASTStatements jjtn000 = new ASTStatements(JJTSTATEMENTS);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
-{/*@bgen(jjtree) Statements */
-  try {
-/*@egen*/
-  (Statement())*/*@bgen(jjtree)*/
-  {
-    jjtree.closeNodeScope(jjtn000, true);
-    jjtc000 = false;
-  }
-/*@egen*/
-  { return jjtn000;}/*@bgen(jjtree)*/
-  } catch (Throwable jjte000) {
-    if (jjtc000) {
-      jjtree.clearNodeScope(jjtn000);
-      jjtc000 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte000 instanceof RuntimeException) {
-      throw (RuntimeException)jjte000;
-    }
-    if (jjte000 instanceof ParseException) {
-      throw (ParseException)jjte000;
-    }
-    throw (Error)jjte000;
-  } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
-  }
-/*@egen*/
+void Statements()        : {}
+{
+  (Statement())*
+  //{ return jjtThis;}
 }
 
 void Statement()       : {}
@@ -469,12 +438,12 @@ void IfStatement() : {/*@bgen(jjtree) IfStatement */
 /*@egen*/ 
 }
 
-void WhileStatement() : {/*@bgen(jjtree) WhileStatement */
-  ASTWhileStatement jjtn000 = new ASTWhileStatement(JJTWHILESTATEMENT);
+void WhileStatement()        : {/*@bgen(jjtree) LOOP */
+  ASTLOOP jjtn000 = new ASTLOOP(JJTLOOP);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) WhileStatement */
+{/*@bgen(jjtree) LOOP */
   try {
 /*@egen*/
   <WHILE> "(" Expression() ")" Statement()/*@bgen(jjtree)*/

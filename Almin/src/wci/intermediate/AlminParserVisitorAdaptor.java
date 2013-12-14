@@ -10,6 +10,7 @@ import wci.frontend.ASTGE;
 import wci.frontend.ASTGT;
 import wci.frontend.ASTIfStatement;
 import wci.frontend.ASTLE;
+import wci.frontend.ASTLOOP;
 import wci.frontend.ASTLT;
 import wci.frontend.ASTLiteral;
 import wci.frontend.ASTNE;
@@ -43,11 +44,11 @@ public class AlminParserVisitorAdaptor implements AlminParserVisitor
 		return node.childrenAccept(this, data);
 	}
 
-	@Override
+	/*@Override
 	public Object visit(ASTStatements node, Object data) {
 		return node.childrenAccept(this, data);
 	}
-
+*/
 	@Override
 	public Object visit(ASTAssignmentStatement node, Object data) {
 		return node.childrenAccept(this, data);
@@ -59,7 +60,7 @@ public class AlminParserVisitorAdaptor implements AlminParserVisitor
 	}
 
 	@Override
-	public Object visit(ASTWhileStatement node, Object data) {
+	public Object visit(ASTLOOP node, Object data) {
 		return node.childrenAccept(this, data);
 	}
 

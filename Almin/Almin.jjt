@@ -300,9 +300,9 @@ SimpleNode Block() :
   "{"
       [<DECLARATION > ":" (VariableDeclaration())*
       <STATEMENT> ":"]
-      rootNode = Statements()
+      Statements()
   "}"
-  { return rootNode ;}
+  { return jjtThis ;}
 }
 
 SimpleNode ScopedBlock() #void :
@@ -325,10 +325,10 @@ void VariableDeclaration()  #void :
   ";"
 }
 
-SimpleNode Statements() : {}
+void Statements() # void : {}
 {
   (Statement())*
-  { return jjtThis;}
+  //{ return jjtThis;}
 }
 
 void Statement() #void : {}
@@ -351,7 +351,7 @@ void IfStatement() : {} {
   [LOOKAHEAD(1) <ELSE> Statement()] 
 }
 
-void WhileStatement() : {}
+void WhileStatement() # LOOP : {}
 {
   <WHILE> "(" Expression() ")" Statement()     }
 

@@ -244,11 +244,11 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           jj_la1[4] = jj_gen;
           ;
         }
-        rootNode = Statements();
+        Statements();
         jj_consume_token(RBRACE);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    {if (true) return rootNode ;}
+    {if (true) return jjtn000 ;}
       } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -302,53 +302,25 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     }
   }
 
-  static final public SimpleNode Statements() throws ParseException {
+  static final public void Statements() throws ParseException {
     trace_call("Statements");
     try {
-                           /*@bgen(jjtree) Statements */
-  ASTStatements jjtn000 = new ASTStatements(JJTSTATEMENTS);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-      try {
-        label_4:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case IF:
-          case WHILE:
-          case RETURN:
-          case LBRACE:
-          case IDENTIFIER:
-            ;
-            break;
-          default:
-            jj_la1[5] = jj_gen;
-            break label_4;
-          }
-          Statement();
+      label_4:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case IF:
+        case WHILE:
+        case RETURN:
+        case LBRACE:
+        case IDENTIFIER:
+          ;
+          break;
+        default:
+          jj_la1[5] = jj_gen;
+          break label_4;
         }
-    jjtree.closeNodeScope(jjtn000, true);
-    jjtc000 = false;
-    {if (true) return jjtn000;}
-      } catch (Throwable jjte000) {
-    if (jjtc000) {
-      jjtree.clearNodeScope(jjtn000);
-      jjtc000 = false;
-    } else {
-      jjtree.popNode();
-    }
-    if (jjte000 instanceof RuntimeException) {
-      {if (true) throw (RuntimeException)jjte000;}
-    }
-    if (jjte000 instanceof ParseException) {
-      {if (true) throw (ParseException)jjte000;}
-    }
-    {if (true) throw (Error)jjte000;}
-      } finally {
-    if (jjtc000) {
-      jjtree.closeNodeScope(jjtn000, true);
-    }
+        Statement();
       }
-    throw new Error("Missing return statement in function");
     } finally {
       trace_return("Statements");
     }
@@ -491,8 +463,8 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
   static final public void WhileStatement() throws ParseException {
     trace_call("WhileStatement");
     try {
-                         /*@bgen(jjtree) WhileStatement */
-  ASTWhileStatement jjtn000 = new ASTWhileStatement(JJTWHILESTATEMENT);
+                                /*@bgen(jjtree) LOOP */
+  ASTLOOP jjtn000 = new ASTLOOP(JJTLOOP);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
       try {

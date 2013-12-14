@@ -5,36 +5,34 @@ public interface AlminParserTreeConstants
 {
   public int JJTVOID = 0;
   public int JJTBLOCK = 1;
-  public int JJTSTATEMENTS = 2;
-  public int JJTASSIGNMENTSTATEMENT = 3;
-  public int JJTIFSTATEMENT = 4;
-  public int JJTWHILESTATEMENT = 5;
-  public int JJTFUNCTIONCALL = 6;
-  public int JJTRETURNSTATEMENT = 7;
-  public int JJTLT = 8;
-  public int JJTLE = 9;
-  public int JJTGT = 10;
-  public int JJTGE = 11;
-  public int JJTEQ = 12;
-  public int JJTNE = 13;
-  public int JJTADD = 14;
-  public int JJTSUB = 15;
-  public int JJTOR = 16;
-  public int JJTMULT = 17;
-  public int JJTDIV = 18;
-  public int JJTAND = 19;
-  public int JJTSTRINGLITERAL = 20;
-  public int JJTLITERAL = 21;
-  public int JJTVARIABLE = 22;
+  public int JJTASSIGNMENTSTATEMENT = 2;
+  public int JJTIFSTATEMENT = 3;
+  public int JJTLOOP = 4;
+  public int JJTFUNCTIONCALL = 5;
+  public int JJTRETURNSTATEMENT = 6;
+  public int JJTLT = 7;
+  public int JJTLE = 8;
+  public int JJTGT = 9;
+  public int JJTGE = 10;
+  public int JJTEQ = 11;
+  public int JJTNE = 12;
+  public int JJTADD = 13;
+  public int JJTSUB = 14;
+  public int JJTOR = 15;
+  public int JJTMULT = 16;
+  public int JJTDIV = 17;
+  public int JJTAND = 18;
+  public int JJTSTRINGLITERAL = 19;
+  public int JJTLITERAL = 20;
+  public int JJTVARIABLE = 21;
 
 
   public String[] jjtNodeName = {
     "void",
     "Block",
-    "Statements",
     "AssignmentStatement",
     "IfStatement",
-    "WhileStatement",
+    "LOOP",
     "FunctionCall",
     "ReturnStatement",
     "LT",
@@ -54,4 +52,4 @@ public interface AlminParserTreeConstants
     "Variable",
   };
 }
-/* JavaCC - OriginalChecksum=c0844a05a3b918672d747d988e9dab53 (do not edit this line) */
+/* JavaCC - OriginalChecksum=ac83cb93987e9d7e676ca8ddd658f291 (do not edit this line) */
