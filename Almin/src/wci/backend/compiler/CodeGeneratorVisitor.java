@@ -321,7 +321,7 @@ public class CodeGeneratorVisitor
     	return data;
     }
     
-    public Object visit(ASTWhileStatement node, Object data){
+    public Object visit(ASTLOOP node, Object data){
     	CodeGenerator.objectFile.println("L" + String.format("%03d", ++labelCount) + ":");
     	int indexToCondition = labelCount;
     	
