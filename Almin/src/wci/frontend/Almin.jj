@@ -129,6 +129,7 @@ TOKEN : {
   | <IF          : "if">
   | <ELSE        : "else">
   | <WHILE       : "while">
+  | <FOR         : "for">
   | <RETURN      : "return">                    
 }
 
@@ -363,23 +364,23 @@ void VariableDeclaration()        :
 void Statements()        : {}
 {
   (Statement())*
-  //{ return jjtThis;}
 }
 
 void Statement()       : {}
 {
   LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  AssignmentStatement() | FunctionCall() ";" | ScopedBlock() | ControlStatement() |  ReturnStatement()
+  Assignment() ";" | FunctionCall() ";"
+  | ScopedBlock() | ControlStatement() |  ReturnStatement() | ";"
 }
 
-void AssignmentStatement() : {/*@bgen(jjtree) AssignmentStatement */
-  ASTAssignmentStatement jjtn000 = new ASTAssignmentStatement(JJTASSIGNMENTSTATEMENT);
+void Assignment()           : {/*@bgen(jjtree) ASSIGN */
+  ASTASSIGN jjtn000 = new ASTASSIGN(JJTASSIGN);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
-/*@egen*/}{/*@bgen(jjtree) AssignmentStatement */
+/*@egen*/}{/*@bgen(jjtree) ASSIGN */
   try {
 /*@egen*/
-  Variable() "=" Expression() ";"/*@bgen(jjtree)*/
+  Variable() "=" Expression()/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -403,7 +404,7 @@ void AssignmentStatement() : {/*@bgen(jjtree) AssignmentStatement */
 
 void ControlStatement()       : {}
 {
-  IfStatement() | WhileStatement()
+  IfStatement() | WhileLoop() | ForLoop()
 }
 
 void IfStatement() : {/*@bgen(jjtree) IfStatement */
@@ -438,7 +439,7 @@ void IfStatement() : {/*@bgen(jjtree) IfStatement */
 /*@egen*/ 
 }
 
-void WhileStatement()        : {/*@bgen(jjtree) LOOP */
+void WhileLoop()        : {/*@bgen(jjtree) LOOP */
   ASTLOOP jjtn000 = new ASTLOOP(JJTLOOP);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
@@ -446,7 +447,7 @@ void WhileStatement()        : {/*@bgen(jjtree) LOOP */
 {/*@bgen(jjtree) LOOP */
   try {
 /*@egen*/
-  <WHILE> "(" Expression() ")" Statement()/*@bgen(jjtree)*/
+  <WHILE> "(" BooleanExpression() ")" Statement()/*@bgen(jjtree)*/
   } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -467,6 +468,41 @@ void WhileStatement()        : {/*@bgen(jjtree) LOOP */
     }
   }
 /*@egen*/     }
+
+void ForLoop()        : {ICodeNode node; int count = 2;}{
+  <FOR> "("
+  [Expression() ("," Expression())*]";"
+  BooleanExpression() ";"
+  [Expression() {count++;} ("," Expression())* {count++;}]
+  ")"/*@bgen(jjtree) LOOP */
+  {
+    ASTLOOP jjtn001 = new ASTLOOP(JJTLOOP);
+    boolean jjtc001 = true;
+    jjtree.openNodeScope(jjtn001);
+  }
+  try {
+/*@egen*/
+  Statement()/*@bgen(jjtree)*/
+  } catch (Throwable jjte001) {
+    if (jjtc001) {
+      jjtree.clearNodeScope(jjtn001);
+      jjtc001 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte001 instanceof RuntimeException) {
+      throw (RuntimeException)jjte001;
+    }
+    if (jjte001 instanceof ParseException) {
+      throw (ParseException)jjte001;
+    }
+    throw (Error)jjte001;
+  } finally {
+    if (jjtc001) {
+      jjtree.closeNodeScope(jjtn001, true);
+    }
+  }
+/*@egen*/        //{ jjtThis.addChild(node); }}
 
 void FunctionCall() : {/*@bgen(jjtree) FunctionCall */
   ASTFunctionCall jjtn000 = new ASTFunctionCall(JJTFUNCTIONCALL);
@@ -538,34 +574,38 @@ void ReturnStatement() : {/*@bgen(jjtree) ReturnStatement */
 
 void Expression()       : {}
 {
-  StringLiteral() |
-  SimpleExpression()   [ <LT>/*@bgen(jjtree) #LT( 2) */
-                              {
-                                ASTLT jjtn001 = new ASTLT(JJTLT);
-                                boolean jjtc001 = true;
-                                jjtree.openNodeScope(jjtn001);
-                              }
-                              try {
+  StringLiteral() | LOOKAHEAD(2) Assignment() | BooleanExpression()
+}
+
+void BooleanExpression()       : {}
+{
+   SimpleExpression()   [ <LT>/*@bgen(jjtree) #LT( 2) */
+                               {
+                                 ASTLT jjtn001 = new ASTLT(JJTLT);
+                                 boolean jjtc001 = true;
+                                 jjtree.openNodeScope(jjtn001);
+                               }
+                               try {
 /*@egen*/ SimpleExpression()/*@bgen(jjtree)*/
-                              } catch (Throwable jjte001) {
-                                if (jjtc001) {
-                                  jjtree.clearNodeScope(jjtn001);
-                                  jjtc001 = false;
-                                } else {
-                                  jjtree.popNode();
-                                }
-                                if (jjte001 instanceof RuntimeException) {
-                                  throw (RuntimeException)jjte001;
-                                }
-                                if (jjte001 instanceof ParseException) {
-                                  throw (ParseException)jjte001;
-                                }
-                                throw (Error)jjte001;
-                              } finally {
-                                if (jjtc001) {
-                                  jjtree.closeNodeScope(jjtn001,  2);
-                                }
-                              }
+                               } catch (Throwable jjte001) {
+                                 if (jjtc001) {
+                                   jjtree.clearNodeScope(jjtn001);
+                                   jjtc001 = false;
+                                 } else {
+                                   jjtree.popNode();
+                                 }
+                                 if (jjte001 instanceof RuntimeException) {
+                                   throw (RuntimeException)jjte001;
+                                 }
+                                 if (jjte001 instanceof ParseException) {
+                                   throw (ParseException)jjte001;
+                                 }
+                                 throw (Error)jjte001;
+                               } finally {
+                                 if (jjtc001) {
+                                   jjtree.closeNodeScope(jjtn001,  2);
+                                 }
+                               }
 /*@egen*/       
                        | <LE>/*@bgen(jjtree) #LE( 2) */
                               {
@@ -707,8 +747,7 @@ void Expression()       : {}
                                 }
                               }
 /*@egen*/       
-                       ]
-}
+                       ] }
 
 void SimpleExpression()       : {}
 {

@@ -59,6 +59,7 @@ public class AlminParser
       fr = new java.io.FileReader(filePath);
     } catch (FileNotFoundException e) {
       System.out.println("Error: \"" + filePath + "\" does not exist");
+      return;
     }
 
     // Get the file name without the ".al" suffix 
@@ -125,6 +126,7 @@ TOKEN : {
   | <IF          : "if">
   | <ELSE        : "else">
   | <WHILE       : "while">
+  | <FOR         : "for">
   | <RETURN      : "return">                    
 }
 
@@ -328,21 +330,21 @@ void VariableDeclaration()  #void :
 void Statements() # void : {}
 {
   (Statement())*
-  //{ return jjtThis;}
 }
 
 void Statement() #void : {}
 {
   LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  AssignmentStatement() | FunctionCall() ";" | ScopedBlock() | ControlStatement() |  ReturnStatement()
+  Assignment() ";" | FunctionCall() ";"
+  | ScopedBlock() | ControlStatement() |  ReturnStatement() | ";"
 }
 
-void AssignmentStatement() : {}{
-  Variable() "=" Expression() ";"}
+void Assignment()  # ASSIGN : {}{
+  Variable() "=" Expression()}
 
 void ControlStatement() #void : {}
 {
-  IfStatement() | WhileStatement()
+  IfStatement() | WhileLoop() | ForLoop()
 }
 
 void IfStatement() : {} {
@@ -351,10 +353,18 @@ void IfStatement() : {} {
   [LOOKAHEAD(1) <ELSE> Statement()] 
 }
 
-void WhileStatement() # LOOP : {}
+void WhileLoop() # LOOP : {}
 {
-  <WHILE> "(" Expression() ")" Statement()     }
-
+  <WHILE> "(" BooleanExpression() ")" Statement()     }
+/*
+void ForLoop() # void : {ICodeNode node; int count = 2;}{
+  <FOR> "("
+  [Expression() ("," Expression())*]";"
+  BooleanExpression() ";"
+  [Expression() {count++;} ("," Expression())* {count++;}]
+  ")"
+  Statement() #LOOP  //{ jjtThis.addChild(node); }}
+*/
 void FunctionCall() : {}
 {
   <IDENTIFIER> {
@@ -373,15 +383,18 @@ void ReturnStatement() : {}
 
 void Expression() #void : {}
 {
-  StringLiteral() |
-  SimpleExpression()   [ <LT> SimpleExpression() #LT(2)
+  StringLiteral() | LOOKAHEAD(2) Assignment() | BooleanExpression()
+}
+
+void BooleanExpression() #void : {}
+{
+   SimpleExpression()   [ <LT> SimpleExpression() #LT(2)
                        | <LE> SimpleExpression() #LE(2)
                        | <GT> SimpleExpression() #GT(2)
                        | <GE> SimpleExpression() #GE(2)
                        | <EQ> SimpleExpression() #EQ(2)
                        | <NE> SimpleExpression() #NE(2)
-                       ]
-}
+                       ] }
 
 void SimpleExpression() #void : {}
 {

@@ -5,7 +5,7 @@ public interface AlminParserTreeConstants
 {
   public int JJTVOID = 0;
   public int JJTBLOCK = 1;
-  public int JJTASSIGNMENTSTATEMENT = 2;
+  public int JJTASSIGN = 2;
   public int JJTIFSTATEMENT = 3;
   public int JJTLOOP = 4;
   public int JJTFUNCTIONCALL = 5;
@@ -30,7 +30,7 @@ public interface AlminParserTreeConstants
   public String[] jjtNodeName = {
     "void",
     "Block",
-    "AssignmentStatement",
+    "ASSIGN",
     "IfStatement",
     "LOOP",
     "FunctionCall",
@@ -52,4 +52,4 @@ public interface AlminParserTreeConstants
     "Variable",
   };
 }
-/* JavaCC - OriginalChecksum=ac83cb93987e9d7e676ca8ddd658f291 (do not edit this line) */
+/* JavaCC - OriginalChecksum=32eebf3f3ec29be84b819ba9ae1241a1 (do not edit this line) */

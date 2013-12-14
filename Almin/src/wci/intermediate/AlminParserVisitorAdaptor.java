@@ -1,5 +1,6 @@
 package wci.intermediate;
 
+import wci.frontend.ASTASSIGN;
 import wci.frontend.ASTAssignmentStatement;
 import wci.frontend.ASTBlock;
 import wci.frontend.ASTEQ;
@@ -50,7 +51,7 @@ public class AlminParserVisitorAdaptor implements AlminParserVisitor
 	}
 */
 	@Override
-	public Object visit(ASTAssignmentStatement node, Object data) {
+	public Object visit(ASTASSIGN node, Object data) {
 		return node.childrenAccept(this, data);
 	}
 

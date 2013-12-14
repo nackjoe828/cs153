@@ -31,83 +31,85 @@ public interface AlminParserConstants {
   /** RegularExpression Id. */
   int WHILE = 12;
   /** RegularExpression Id. */
-  int RETURN = 13;
+  int FOR = 13;
   /** RegularExpression Id. */
-  int STAR = 14;
+  int RETURN = 14;
   /** RegularExpression Id. */
-  int MINUS = 15;
+  int STAR = 15;
   /** RegularExpression Id. */
-  int PLUS = 16;
+  int MINUS = 16;
   /** RegularExpression Id. */
-  int ASSIGN = 17;
+  int PLUS = 17;
   /** RegularExpression Id. */
-  int SLASH = 18;
+  int ASSIGN = 18;
   /** RegularExpression Id. */
-  int COLON = 19;
+  int SLASH = 19;
   /** RegularExpression Id. */
-  int SEMICOLON = 20;
+  int COLON = 20;
   /** RegularExpression Id. */
-  int HOOK = 21;
+  int SEMICOLON = 21;
   /** RegularExpression Id. */
-  int LT = 22;
+  int HOOK = 22;
   /** RegularExpression Id. */
-  int GT = 23;
+  int LT = 23;
   /** RegularExpression Id. */
-  int DOT = 24;
+  int GT = 24;
   /** RegularExpression Id. */
-  int COMMA = 25;
+  int DOT = 25;
   /** RegularExpression Id. */
-  int SINGLEQUOTE = 26;
+  int COMMA = 26;
   /** RegularExpression Id. */
-  int DOUBLEQUOTE = 27;
+  int SINGLEQUOTE = 27;
   /** RegularExpression Id. */
-  int LPAREN = 28;
+  int DOUBLEQUOTE = 28;
   /** RegularExpression Id. */
-  int RPAREN = 29;
+  int LPAREN = 29;
   /** RegularExpression Id. */
-  int LBRACE = 30;
+  int RPAREN = 30;
   /** RegularExpression Id. */
-  int RBRACE = 31;
+  int LBRACE = 31;
   /** RegularExpression Id. */
-  int LE = 32;
+  int RBRACE = 32;
   /** RegularExpression Id. */
-  int GE = 33;
+  int LE = 33;
   /** RegularExpression Id. */
-  int EQ = 34;
+  int GE = 34;
   /** RegularExpression Id. */
-  int NE = 35;
+  int EQ = 35;
   /** RegularExpression Id. */
-  int AND = 36;
+  int NE = 36;
   /** RegularExpression Id. */
-  int OR = 37;
+  int AND = 37;
   /** RegularExpression Id. */
-  int NOT = 38;
+  int OR = 38;
   /** RegularExpression Id. */
-  int IDENTIFIER = 39;
+  int NOT = 39;
   /** RegularExpression Id. */
-  int DIGIT = 40;
+  int IDENTIFIER = 40;
   /** RegularExpression Id. */
-  int LETTER = 41;
+  int DIGIT = 41;
   /** RegularExpression Id. */
-  int CHAR = 42;
+  int LETTER = 42;
   /** RegularExpression Id. */
-  int STRING = 43;
+  int CHAR = 43;
   /** RegularExpression Id. */
-  int BOOL = 44;
+  int STRING = 44;
   /** RegularExpression Id. */
-  int INT = 45;
+  int BOOL = 45;
   /** RegularExpression Id. */
-  int REAL = 46;
+  int INT = 46;
   /** RegularExpression Id. */
-  int SIGN = 47;
+  int REAL = 47;
   /** RegularExpression Id. */
-  int UNSIGNED = 48;
+  int SIGN = 48;
   /** RegularExpression Id. */
-  int WHOLE = 49;
+  int UNSIGNED = 49;
   /** RegularExpression Id. */
-  int FRACTION = 50;
+  int WHOLE = 50;
   /** RegularExpression Id. */
-  int EXPONENT = 51;
+  int FRACTION = 51;
+  /** RegularExpression Id. */
+  int EXPONENT = 52;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -129,6 +131,7 @@ public interface AlminParserConstants {
     "\"if\"",
     "\"else\"",
     "\"while\"",
+    "\"for\"",
     "\"return\"",
     "\"*\"",
     "\"-\"",

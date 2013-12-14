@@ -5,7 +5,7 @@ public interface AlminParserVisitor
 {
   public Object visit(SimpleNode node, Object data);
   public Object visit(ASTBlock node, Object data);
-  public Object visit(ASTAssignmentStatement node, Object data);
+  public Object visit(ASTASSIGN node, Object data);
   public Object visit(ASTIfStatement node, Object data);
   public Object visit(ASTLOOP node, Object data);
   public Object visit(ASTFunctionCall node, Object data);
@@ -26,4 +26,4 @@ public interface AlminParserVisitor
   public Object visit(ASTLiteral node, Object data);
   public Object visit(ASTVariable node, Object data);
 }
-/* JavaCC - OriginalChecksum=8e40796e6358a679580bfc8894d3440d (do not edit this line) */
+/* JavaCC - OriginalChecksum=a83bf78d055efc0181ace63572c678ed (do not edit this line) */

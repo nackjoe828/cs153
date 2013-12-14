@@ -1,4 +1,4 @@
-.class public While
+.class public For
 .super java/lang/Object
 
 
@@ -14,26 +14,23 @@
 
 .method public static main([Ljava/lang/String;)V
 
-    ldc 0.0
-    putstatic While/b F
+    getstatic For/i I
     ldc 0
-    putstatic While/exp I
-L002:
-    getstatic While/exp I
+    getstatic For/i I
     ldc 10
-    if_icmpgt L003
-    iconst_0
-    goto L004
-L003:
-    iconst_1
-L004:
-    ifne L005
-    getstatic While/exp I
+    if_icmpgt L002
+    getstatic For/i I
+    getstatic For/i I
     ldc 1
     iadd
-    putstatic While/exp I
-    goto L002:
-L005:
+    getstatic For/j I
+    ldc 10
+    getstatic For/j I
+    ldc 5
+    getstatic For/j I
+    ldc 1
+    getstatic For/j I
+    getstatic For/i I
 
 
     return
