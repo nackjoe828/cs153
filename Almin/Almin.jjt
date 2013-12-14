@@ -91,7 +91,13 @@ public class AlminParser
         
     // Print the parse tree.
     ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
-    treePrinter.print(symTabStack);   
+    treePrinter.print(symTabStack);
+
+        // Create the compiler backend and generate code.
+    try    {
+   	 Backend backend = BackendFactory.createBackend("compile");
+	    backend.process(iCode, symTabStack, name + OUTPUT_SUFFIX);
+	  }catch(Exception ex)	  {ex.printStackTrace();}
   } 
 }    
 PARSER_END(AlminParser)
