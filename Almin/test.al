@@ -15,7 +15,6 @@ STATEMENT:
 		i=i+1;
 	}
 	return ret;
-	ans = 0.0;
 }
 
 main {
@@ -35,7 +34,7 @@ STATEMENT:
 		exp=exp+1;
 	}
 	if (exp == 0)
-		exp == 4;
+		exp = 4;
 }
 
 
