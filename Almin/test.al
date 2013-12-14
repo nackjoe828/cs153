@@ -6,7 +6,7 @@ void proc1() {
 real pow(real b, int exp) {
 DECLARATION:
 	int i;
-	real ret;
+	real ret2;
 STATEMENT:
 	i = 0;
 	ret = 1.0;
