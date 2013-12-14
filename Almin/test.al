@@ -15,6 +15,7 @@ STATEMENT:
 		i=i+1;
 	}
 	return ret;
+	ans = 0.0;
 }
 
 main {
