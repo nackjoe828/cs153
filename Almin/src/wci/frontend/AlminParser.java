@@ -78,7 +78,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
     treePrinter.print(symTabStack);
 
-        // Create the compiler backend and generate code.
+    // Create the compiler backend and generate code.
     try
     {
          Backend backend = BackendFactory.createBackend("compile");

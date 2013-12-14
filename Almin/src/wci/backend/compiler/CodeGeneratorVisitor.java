@@ -90,6 +90,13 @@ public class CodeGeneratorVisitor
     	}
         return null;
     }
+    
+    public Object visit(ASTStringLiteral node, Object data){
+    	String str = (String) node.getAttribute(VALUE);
+    	CodeGenerator.objectFile.println("    ldc \"" + str + "\"");
+    	CodeGenerator.objectFile.flush();
+    	return data;
+    }
 
     public Object visit(ASTadd node, Object data)
     {
@@ -247,6 +254,39 @@ public class CodeGeneratorVisitor
         return data;
     }
     
+    public Object visit(ASTFunctionCall node, Object data){
+    	String programName = (String) data;
+    	SymTabEntry id = (SymTabEntry) node.getAttribute(ID);
+    	String fieldName = id.getName();
+    	TypeSpec type = id.getTypeSpec();
+    	String typeCode;
+    	if(type == Predefined.integerType) typeCode = "I";
+    	else if(type == Predefined.realType) typeCode = "F";
+    	else typeCode = "";
+    	
+    	//check type id for each parameters
+    	int argCount = node.jjtGetNumChildren();
+    	String[] typeCodes = new String[argCount]; //store type codes for each parameter
+    	SimpleNode currentChildNode;
+    	for(int i = 0; i < argCount; i++){
+    		currentChildNode = (SimpleNode) node.jjtGetChild(i);
+    		currentChildNode.jjtAccept(this, data);
+    		TypeSpec currentChildType = currentChildNode.getTypeSpec();
+        	if(currentChildType == Predefined.integerType) typeCodes[i] = "I";
+        	if(currentChildType == Predefined.realType) typeCodes[i] = "F";
+    	}
+    	
+    	//generate code to call function
+    	String signature = programName + "/" + fieldName + "(";
+    	for(int i = 0; i < argCount; i++){
+    		signature += typeCodes[i];
+    	}
+    	signature += ")" + typeCode;
+    	CodeGenerator.objectFile.println("    invokestatic " + signature);
+    	
+    	return data;
+    }
+    
     public Object visit(ASTIfStatement node, Object data){
     	SimpleNode conditionNode = (SimpleNode) node.jjtGetChild(0);
     	
@@ -301,6 +341,7 @@ public class CodeGeneratorVisitor
     	blockNode.jjtAccept(this, data);
     	CodeGenerator.objectFile.println("    goto L" + String.format("%03d", indexToCondition) + ":");
     	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
+    	CodeGenerator.objectFile.flush();
     	return data;
     }
     
