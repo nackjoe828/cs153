@@ -95,9 +95,11 @@ public class AlminParser
 
         // Create the compiler backend and generate code.
     try    {
-   	 Backend backend = BackendFactory.createBackend("compile");
-	    backend.process(iCode, symTabStack, name + OUTPUT_SUFFIX);
-	  }catch(Exception ex)	  {ex.printStackTrace();}
+   	 	Backend backend = BackendFactory.createBackend("compile");
+	 	backend.process(iCode, symTabStack, name + OUTPUT_SUFFIX);
+	 }catch(Exception ex) {
+	   ex.printStackTrace();
+	 }
   } 
 }    
 PARSER_END(AlminParser)

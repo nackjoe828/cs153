@@ -77,8 +77,6 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     // Print the parse tree.
     ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
     treePrinter.print(symTabStack);
-<<<<<<< HEAD
-=======
 
         // Create the compiler backend and generate code.
     try
@@ -87,7 +85,6 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
             backend.process(iCode, symTabStack, name + OUTPUT_SUFFIX);
           }catch(Exception ex)
           {ex.printStackTrace();}
->>>>>>> acded8750df5218c154a26ec2f00e4653b5b16cd
   }
 
 /*****************************************
@@ -1249,17 +1246,6 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     finally { jj_save(1, xla); }
   }
 
-  static private boolean jj_3R_9() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1() {
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_10() {
     if (jj_scan_token(IDENTIFIER)) return true;
     return false;
@@ -1273,6 +1259,17 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
 
   static private boolean jj_3_2() {
     if (jj_3R_9()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_9() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1() {
+    if (jj_3R_8()) return true;
     return false;
   }
 
