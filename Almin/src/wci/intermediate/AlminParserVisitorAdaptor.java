@@ -2,8 +2,8 @@ package wci.intermediate;
 
 import wci.frontend.ASTAssignmentStatement;
 import wci.frontend.ASTBlock;
-import wci.frontend.ASTEQ;
 import wci.frontend.ASTExpression;
+import wci.frontend.ASTEQ;
 import wci.frontend.ASTFactor;
 import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTGE;
