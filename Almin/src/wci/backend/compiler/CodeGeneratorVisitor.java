@@ -47,7 +47,7 @@ public class CodeGeneratorVisitor
         return data;
     }
     
-    public Object visit(ASTName node, Object data)
+    public Object visit(ASTVariable node, Object data)
     {
     	String programName = (String) data;
         SymTabEntry id = (SymTabEntry) node.getAttribute(ID);
@@ -278,6 +278,29 @@ public class CodeGeneratorVisitor
     	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
     	CodeGenerator.objectFile.flush();
     	
+    	return data;
+    }
+    
+    public Object visit(ASTWhileStatement node, Object data){
+    	CodeGenerator.objectFile.println("L" + String.format("%03d", ++labelCount) + ":");
+    	int indexToCondition = labelCount;
+    	
+    	SimpleNode conditionNode = (SimpleNode) node.jjtGetChild(0);
+    	conditionNode.jjtAccept(this, data);
+    	
+    	int storedNumber = labelCount;
+    	CodeGenerator.objectFile.println("    iconst_0");
+    	CodeGenerator.objectFile.println("    goto L" + String.format("%03d", ++labelCount));
+    	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
+    	CodeGenerator.objectFile.println("    iconst_1");
+    	CodeGenerator.objectFile.println("L" + String.format("%03d", labelCount) + ":");
+    	CodeGenerator.objectFile.println("    ifne L" + String.format("%03d", ++labelCount));
+    	storedNumber = labelCount;
+    	
+    	SimpleNode blockNode = (SimpleNode) node.jjtGetChild(1);
+    	blockNode.jjtAccept(this, data);
+    	CodeGenerator.objectFile.println("    goto L" + String.format("%03d", indexToCondition) + ":");
+    	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
     	return data;
     }
     
