@@ -78,13 +78,14 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
     treePrinter.print(symTabStack);
 
-    // Create the compiler backend and generate code.
+        // Create the compiler backend and generate code.
     try
     {
-         Backend backend = BackendFactory.createBackend("compile");
-            backend.process(iCode, symTabStack, name + OUTPUT_SUFFIX);
-          }catch(Exception ex)
-          {ex.printStackTrace();}
+                Backend backend = BackendFactory.createBackend("compile");
+                backend.process(iCode, symTabStack, name + OUTPUT_SUFFIX);
+         }catch(Exception ex) {
+           ex.printStackTrace();
+         }
   }
 
 /*****************************************
@@ -273,6 +274,20 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     }
   }
 
+  static final public SimpleNode ScopedBlock() throws ParseException {
+    trace_call("ScopedBlock");
+    try {
+  SimpleNode rootNode;
+  symTabStack.push();
+      rootNode = Block();
+    symTabStack.pop();
+    {if (true) return rootNode;}
+    throw new Error("Missing return statement in function");
+    } finally {
+      trace_return("ScopedBlock");
+    }
+  }
+
   static final public void VariableDeclaration() throws ParseException {
     trace_call("VariableDeclaration");
     try {
@@ -351,7 +366,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           jj_consume_token(SEMICOLON);
           break;
         case LBRACE:
-          Block();
+          ScopedBlock();
           break;
         case IF:
         case WHILE:
@@ -1246,6 +1261,11 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     finally { jj_save(1, xla); }
   }
 
+  static private boolean jj_3_1() {
+    if (jj_3R_8()) return true;
+    return false;
+  }
+
   static private boolean jj_3R_10() {
     if (jj_scan_token(IDENTIFIER)) return true;
     return false;
@@ -1265,11 +1285,6 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
   static private boolean jj_3R_9() {
     if (jj_scan_token(IDENTIFIER)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1() {
-    if (jj_3R_8()) return true;
     return false;
   }
 

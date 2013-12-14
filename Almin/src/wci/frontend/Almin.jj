@@ -99,9 +99,11 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants/*@e
 
         // Create the compiler backend and generate code.
     try    {
-   	 Backend backend = BackendFactory.createBackend("compile");
-	    backend.process(iCode, symTabStack, name + OUTPUT_SUFFIX);
-	  }catch(Exception ex)	  {ex.printStackTrace();}
+   	 	Backend backend = BackendFactory.createBackend("compile");
+	 	backend.process(iCode, symTabStack, name + OUTPUT_SUFFIX);
+	 }catch(Exception ex) {
+	   ex.printStackTrace();
+	 }
   } 
 }    
 PARSER_END(AlminParser)
@@ -338,6 +340,18 @@ SimpleNode Block() :
 /*@egen*/
 }
 
+SimpleNode ScopedBlock()       :
+{
+  SimpleNode rootNode;
+  symTabStack.push();
+}
+{
+  rootNode = Block()
+  {
+    symTabStack.pop();
+    return rootNode;  }}
+
+
 void VariableDeclaration()        :
 { TypeSpec type; }
 {
@@ -386,7 +400,7 @@ SimpleNode Statements() : {/*@bgen(jjtree) Statements */
 void Statement()       : {}
 {
   LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  AssignmentStatement() | FunctionCall() ";" | Block() | ControlStatement() |  ReturnStatement()
+  AssignmentStatement() | FunctionCall() ";" | ScopedBlock() | ControlStatement() |  ReturnStatement()
 }
 
 void AssignmentStatement() : {/*@bgen(jjtree) AssignmentStatement */
