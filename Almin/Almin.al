@@ -9,12 +9,6 @@ STATEMENT:
 	if(exp > 0){
 		b = 100.0;
 	}
-	else if(exp == 0){
-		b = 0.0;
-	}
-	else{
-		b = 50.0;
-	}
 }
 
 
