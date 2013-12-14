@@ -130,7 +130,6 @@ public class CodeGenerator extends Backend
         objectFile.println(".limit stack  " + STACK_LIMIT);
         objectFile.println(".end method");
         objectFile.flush();
-        System.out.println(Float.MAX_EXPONENT);
 
         CodeGenerator.objectFile.close();
     }
