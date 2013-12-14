@@ -30,7 +30,7 @@ import wci.frontend.ASTsub;
 import wci.frontend.AlminParserVisitor;
 import wci.frontend.SimpleNode;
 
-public class AlminParserVisitorAdapter implements AlminParserVisitor
+public class AlminParserVisitorAdaptor implements AlminParserVisitor
 {
 
 	@Override

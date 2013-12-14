@@ -36,26 +36,26 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
       return;
     }
 
-    String filePath = args[0];
+    String sourceFilePath = args[0];
+    int truncatedLength = sourceFilePath.length() - SOURCE_SUFFIX.length();
+    int suffixIndex = sourceFilePath.lastIndexOf(SOURCE_SUFFIX);
+    String objectFilePath = (suffixIndex == truncatedLength)
+        ? sourceFilePath.substring(0, truncatedLength) + OUTPUT_SUFFIX
+        : sourceFilePath + OUTPUT_SUFFIX;
 
     // Create parser from source
     FileReader fr = null;
     try {
-      fr = new java.io.FileReader(filePath);
+      fr = new java.io.FileReader(sourceFilePath);
     } catch (FileNotFoundException e) {
-      System.out.println("Error: \u005c"" + filePath + "\u005c" does not exist");
+      System.out.println("Error: \u005c"" + sourceFilePath + "\u005c" does not exist");
     }
-
-    // Get the file name without the ".al" suffix 
-    String name = filePath.substring(0, filePath.lastIndexOf(SOURCE_SUFFIX));
-    // Get the file name without Path and suffix (i.e. path/to/filename.al ===> filename)
-        String programName = name.substring(name.lastIndexOf("/")+1);
 
     AlminParser parser = new AlminParser(fr);
     SimpleNode rootNode = null;
 
     try {
-      rootNode = parser.Program(programName);
+      rootNode = parser.Program(objectFilePath);
     }
     catch (ParseException ex) {
       ex.printStackTrace();
@@ -77,6 +77,14 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     // Print the parse tree.
     ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
     treePrinter.print(symTabStack);
+
+    // Create the compiler backend and generate code.
+    try{
+        Backend backend = BackendFactory.createBackend("compile");
+            backend.process(iCode, symTabStack, objectFilePath);
+        }catch (Exception ex){
+                ex.printStackTrace();
+        }
   }
 
 /*****************************************
@@ -1130,7 +1138,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
            jjtree.closeNodeScope(jjtn000, true);
            jjtc000 = false;
         jjtn000.setTypeSpec(Predefined.realType);
-        jjtn000.setAttribute(VALUE, Double.parseDouble(token.image));
+        jjtn000.setAttribute(VALUE, Float.parseFloat(token.image));
           break;
         case CHAR:
           jj_consume_token(CHAR);
@@ -1238,17 +1246,6 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     finally { jj_save(1, xla); }
   }
 
-  static private boolean jj_3R_9() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1() {
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_10() {
     if (jj_scan_token(IDENTIFIER)) return true;
     return false;
@@ -1262,6 +1259,17 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
 
   static private boolean jj_3_2() {
     if (jj_3R_9()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_9() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1() {
+    if (jj_3R_8()) return true;
     return false;
   }
 

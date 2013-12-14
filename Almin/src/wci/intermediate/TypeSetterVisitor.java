@@ -20,7 +20,7 @@ import wci.frontend.SimpleNode;
 import wci.intermediate.symtabimpl.Predefined;
 
 
-public class TypeSetterVisitor extends AlminParserVisitorAdapter
+public class TypeSetterVisitor extends AlminParserVisitorAdaptor
 {
     private void setType(SimpleNode node)
     {
