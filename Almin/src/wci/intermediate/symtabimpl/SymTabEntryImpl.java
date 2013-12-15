@@ -34,6 +34,7 @@ public class SymTabEntryImpl
         this.name = name;
         this.symTab = symTab;
         this.lineNumbers = new ArrayList<Integer>();
+        this.definition = null;
     }
 
     /**

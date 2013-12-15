@@ -38,6 +38,8 @@ public class AlminParser
 
   private static SymTabStack symTabStack;
   private static SymTabEntry programId;
+
+  private static int errorCount = 0;
   
   public static void main(String[] args)
   {    
@@ -80,16 +82,16 @@ public class AlminParser
     // Print the cross-reference table.
     CrossReferencer crossReferencer = new CrossReferencer();
     crossReferencer.print(symTabStack);
-
+	if (rootNode != null)
+	{
     // Visit the parse tree nodes to decorate them with type information.
     TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
     rootNode.jjtAccept(typeVisitor, null);
 
-    // Create and initialize the ICode wrapper for the parse tree.
-    ICode iCode = ICodeFactory.createICode();
-    iCode.setRoot(rootNode);
-    programId.setAttribute(ROUTINE_ICODE, iCode);
-        
+    	// Create and initialize the ICode wrapper for the parse tree.
+    	ICode iCode = ICodeFactory.createICode();
+    	iCode.setRoot(rootNode);
+    	programId.setAttribute(ROUTINE_ICODE, iCode); 
     // Print the parse tree.
     ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
     treePrinter.print(symTabStack);
@@ -101,6 +103,7 @@ public class AlminParser
 	 }catch(Exception ex) {
 	   ex.printStackTrace();
 	 }
+	}
   } 
 }    
 PARSER_END(AlminParser)
@@ -222,8 +225,14 @@ SimpleNode Program(String programName) #void :
   programId.setAttribute(ROUTINE_ROUTINES, new ArrayList<SymTabEntry>());
 }
 {
-  rootNode = FunctionDefinitions()
-  <EOF>
+  try { 
+    rootNode = FunctionDefinitions()
+    <EOF>
+  } catch (ParseException e) {
+     if (e.getMessage() != null)
+     	System.out.println("** Compilation Error:" + " " + e.getMessage());
+     return null;
+  } 
   {
     symTabStack.pop();
     return rootNode;
@@ -327,7 +336,7 @@ void VariableDeclaration()  #void :
   	<IDENTIFIER> { javaCodeProcessVariableDeclaration(token, type); }
   	";"
     } catch (ParseException e) {
-     javaCodeSkipLine();
+     //javaCodeSkipLine();
      if (e.getMessage() != null)
      	System.out.println("** Compilation Error:" + " " + e.getMessage());
   } 
@@ -409,12 +418,12 @@ void Expression() #void : {}
 void BooleanExpression() #void : {}
 {
    SimpleExpression()   [ <LT> SimpleExpression() #LT(2)
-                       | <LE> SimpleExpression() #LE(2)
-                       | <GT> SimpleExpression() #GT(2)
-                       | <GE> SimpleExpression() #GE(2)
-                       | <EQ> SimpleExpression() #EQ(2)
-                       | <NE> SimpleExpression() #NE(2)
-                       ] }
+                        | <LE> SimpleExpression() #LE(2)
+                        | <GT> SimpleExpression() #GT(2)
+                        | <GE> SimpleExpression() #GE(2)
+                        | <EQ> SimpleExpression() #EQ(2)
+                        | <NE> SimpleExpression() #NE(2)
+                        ] }
 
 void SimpleExpression() #void : {}
 {
@@ -468,7 +477,7 @@ void Variable() : {}
   		SymTabEntry variableId = symTabStack.lookup(token.image);
     	if (variableId == null) {
 			System.out.println("** Compilation Error: Variable of name: \"" + token.image
-		                    + "\" has not been defined at line " + token.beginLine
+		                    + "\" has not been decleared at line " + token.beginLine
 		                    + " column " + token.beginColumn);
 		    throw new ParseException();
     	}
@@ -483,14 +492,26 @@ JAVACODE
 TypeSpec javaCodeGetAndProcessTypeID(Token t) #void
 {
     SymTabEntry typeID = symTabStack.lookup(t.image);
+    if (typeID == null || typeID.getDefinition() != DefinitionImpl.TYPE)
+    {
+      System.out.println("** Compilation Error: Type of name: \"" + t.image
+		                    + "\" does not exist at line " + t.beginLine
+		                    + " column " + t.beginColumn);
+	  throw new ParseException();    }
     typeID.appendLineNumber(t.beginLine);
     return typeID.getTypeSpec(); 
 }
 
 JAVACODE
 SymTabEntry javaCodeProcessFuncDefn(Token t, TypeSpec type) #void
-{    SymTabEntry funcID = symTabStack.enterLocal(t.image);
-    funcID.setDefinition(DefinitionImpl.FUNCTION);
+{
+  	if (symTabStack.getLocalSymTab().lookup(t.image) != null) {
+  	  System.out.println("** Compilation Error: Function of name: \"" + t.image
+		                    + "\" has already been decleared at line " + t.beginLine
+		                    + " column " + t.beginColumn);
+	  throw new ParseException();
+  	}    SymTabEntry funcID = symTabStack.enterLocal(t.image);
+    funcID.setDefinition(DefinitionImpl.TYPE);
     funcID.appendLineNumber(t.beginLine);
     funcID.setTypeSpec(type); // set return type
     return funcID;
@@ -499,6 +520,19 @@ SymTabEntry javaCodeProcessFuncDefn(Token t, TypeSpec type) #void
 JAVACODE
 SymTabEntry javaCodeProcessVariableDeclaration(Token t, TypeSpec type) #void
 {
+  	if (symTabStack.getLocalSymTab().lookup(t.image) != null) {
+  	  System.out.println("** Compilation Error: Variable of name: \"" + t.image
+		                    + "\" has already been decleared at line " + t.beginLine
+		                    + " column " + t.beginColumn);
+		throw new ParseException();  	}
+  	if (symTabStack.lookup(t.image) != null
+  	     && symTabStack.lookup(t.image).getDefinition() == DefinitionImpl.TYPE) {
+  	  System.out.println("** Compilation Error: : Expected identifier at \"" + t.image
+		                    + "\" line " + t.beginLine
+		                    + " column " + t.beginColumn);
+		throw new ParseException();
+  	}
+  	     
     SymTabEntry varID = symTabStack.enterLocal(t.image);
     varID.setDefinition(DefinitionImpl.VARIABLE);
     varID.appendLineNumber(t.beginLine);

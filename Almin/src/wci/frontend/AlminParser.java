@@ -24,6 +24,8 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
   private static SymTabStack symTabStack;
   private static SymTabEntry programId;
 
+  private static int errorCount = 0;
+
   public static void main(String[] args)
   {
     // Create and initialize the symbol table stack.
@@ -65,16 +67,16 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     // Print the cross-reference table.
     CrossReferencer crossReferencer = new CrossReferencer();
     crossReferencer.print(symTabStack);
-
+        if (rootNode != null)
+        {
     // Visit the parse tree nodes to decorate them with type information.
     TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
     rootNode.jjtAccept(typeVisitor, null);
 
-    // Create and initialize the ICode wrapper for the parse tree.
-    ICode iCode = ICodeFactory.createICode();
-    iCode.setRoot(rootNode);
-    programId.setAttribute(ROUTINE_ICODE, iCode);
-
+        // Create and initialize the ICode wrapper for the parse tree.
+        ICode iCode = ICodeFactory.createICode();
+        iCode.setRoot(rootNode);
+        programId.setAttribute(ROUTINE_ICODE, iCode);
     // Print the parse tree.
     ParseTreePrinter treePrinter = new ParseTreePrinter(System.out);
     treePrinter.print(symTabStack);
@@ -87,6 +89,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
          }catch(Exception ex) {
            ex.printStackTrace();
          }
+        }
   }
 
 /*****************************************
@@ -100,8 +103,14 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
   symTabStack.setProgramId(programId);
   programId.setAttribute(ROUTINE_SYMTAB, symTabStack.push());
   programId.setAttribute(ROUTINE_ROUTINES, new ArrayList<SymTabEntry>());
-    rootNode = FunctionDefinitions();
-    jj_consume_token(0);
+    try {
+      rootNode = FunctionDefinitions();
+      jj_consume_token(0);
+    } catch (ParseException e) {
+     if (e.getMessage() != null)
+        System.out.println("** Compilation Error:" + " " + e.getMessage());
+     {if (true) return null;}
+    }
     symTabStack.pop();
     {if (true) return rootNode;}
     throw new Error("Missing return statement in function");
@@ -268,7 +277,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
                        javaCodeProcessVariableDeclaration(token, type);
       jj_consume_token(SEMICOLON);
     } catch (ParseException e) {
-     javaCodeSkipLine();
+     //javaCodeSkipLine();
      if (e.getMessage() != null)
         System.out.println("** Compilation Error:" + " " + e.getMessage());
     }
@@ -646,137 +655,137 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
         break;
       case LE:
         jj_consume_token(LE);
-                                ASTLE jjtn002 = new ASTLE(JJTLE);
-                                boolean jjtc002 = true;
-                                jjtree.openNodeScope(jjtn002);
+                                 ASTLE jjtn002 = new ASTLE(JJTLE);
+                                 boolean jjtc002 = true;
+                                 jjtree.openNodeScope(jjtn002);
         try {
           SimpleExpression();
         } catch (Throwable jjte002) {
-                                if (jjtc002) {
-                                  jjtree.clearNodeScope(jjtn002);
-                                  jjtc002 = false;
-                                } else {
-                                  jjtree.popNode();
-                                }
-                                if (jjte002 instanceof RuntimeException) {
-                                  {if (true) throw (RuntimeException)jjte002;}
-                                }
-                                if (jjte002 instanceof ParseException) {
-                                  {if (true) throw (ParseException)jjte002;}
-                                }
-                                {if (true) throw (Error)jjte002;}
+                                 if (jjtc002) {
+                                   jjtree.clearNodeScope(jjtn002);
+                                   jjtc002 = false;
+                                 } else {
+                                   jjtree.popNode();
+                                 }
+                                 if (jjte002 instanceof RuntimeException) {
+                                   {if (true) throw (RuntimeException)jjte002;}
+                                 }
+                                 if (jjte002 instanceof ParseException) {
+                                   {if (true) throw (ParseException)jjte002;}
+                                 }
+                                 {if (true) throw (Error)jjte002;}
         } finally {
-                                if (jjtc002) {
-                                  jjtree.closeNodeScope(jjtn002,  2);
-                                }
+                                 if (jjtc002) {
+                                   jjtree.closeNodeScope(jjtn002,  2);
+                                 }
         }
         break;
       case GT:
         jj_consume_token(GT);
-                                ASTGT jjtn003 = new ASTGT(JJTGT);
-                                boolean jjtc003 = true;
-                                jjtree.openNodeScope(jjtn003);
+                                 ASTGT jjtn003 = new ASTGT(JJTGT);
+                                 boolean jjtc003 = true;
+                                 jjtree.openNodeScope(jjtn003);
         try {
           SimpleExpression();
         } catch (Throwable jjte003) {
-                                if (jjtc003) {
-                                  jjtree.clearNodeScope(jjtn003);
-                                  jjtc003 = false;
-                                } else {
-                                  jjtree.popNode();
-                                }
-                                if (jjte003 instanceof RuntimeException) {
-                                  {if (true) throw (RuntimeException)jjte003;}
-                                }
-                                if (jjte003 instanceof ParseException) {
-                                  {if (true) throw (ParseException)jjte003;}
-                                }
-                                {if (true) throw (Error)jjte003;}
+                                 if (jjtc003) {
+                                   jjtree.clearNodeScope(jjtn003);
+                                   jjtc003 = false;
+                                 } else {
+                                   jjtree.popNode();
+                                 }
+                                 if (jjte003 instanceof RuntimeException) {
+                                   {if (true) throw (RuntimeException)jjte003;}
+                                 }
+                                 if (jjte003 instanceof ParseException) {
+                                   {if (true) throw (ParseException)jjte003;}
+                                 }
+                                 {if (true) throw (Error)jjte003;}
         } finally {
-                                if (jjtc003) {
-                                  jjtree.closeNodeScope(jjtn003,  2);
-                                }
+                                 if (jjtc003) {
+                                   jjtree.closeNodeScope(jjtn003,  2);
+                                 }
         }
         break;
       case GE:
         jj_consume_token(GE);
-                                ASTGE jjtn004 = new ASTGE(JJTGE);
-                                boolean jjtc004 = true;
-                                jjtree.openNodeScope(jjtn004);
+                                 ASTGE jjtn004 = new ASTGE(JJTGE);
+                                 boolean jjtc004 = true;
+                                 jjtree.openNodeScope(jjtn004);
         try {
           SimpleExpression();
         } catch (Throwable jjte004) {
-                                if (jjtc004) {
-                                  jjtree.clearNodeScope(jjtn004);
-                                  jjtc004 = false;
-                                } else {
-                                  jjtree.popNode();
-                                }
-                                if (jjte004 instanceof RuntimeException) {
-                                  {if (true) throw (RuntimeException)jjte004;}
-                                }
-                                if (jjte004 instanceof ParseException) {
-                                  {if (true) throw (ParseException)jjte004;}
-                                }
-                                {if (true) throw (Error)jjte004;}
+                                 if (jjtc004) {
+                                   jjtree.clearNodeScope(jjtn004);
+                                   jjtc004 = false;
+                                 } else {
+                                   jjtree.popNode();
+                                 }
+                                 if (jjte004 instanceof RuntimeException) {
+                                   {if (true) throw (RuntimeException)jjte004;}
+                                 }
+                                 if (jjte004 instanceof ParseException) {
+                                   {if (true) throw (ParseException)jjte004;}
+                                 }
+                                 {if (true) throw (Error)jjte004;}
         } finally {
-                                if (jjtc004) {
-                                  jjtree.closeNodeScope(jjtn004,  2);
-                                }
+                                 if (jjtc004) {
+                                   jjtree.closeNodeScope(jjtn004,  2);
+                                 }
         }
         break;
       case EQ:
         jj_consume_token(EQ);
-                                ASTEQ jjtn005 = new ASTEQ(JJTEQ);
-                                boolean jjtc005 = true;
-                                jjtree.openNodeScope(jjtn005);
+                                 ASTEQ jjtn005 = new ASTEQ(JJTEQ);
+                                 boolean jjtc005 = true;
+                                 jjtree.openNodeScope(jjtn005);
         try {
           SimpleExpression();
         } catch (Throwable jjte005) {
-                                if (jjtc005) {
-                                  jjtree.clearNodeScope(jjtn005);
-                                  jjtc005 = false;
-                                } else {
-                                  jjtree.popNode();
-                                }
-                                if (jjte005 instanceof RuntimeException) {
-                                  {if (true) throw (RuntimeException)jjte005;}
-                                }
-                                if (jjte005 instanceof ParseException) {
-                                  {if (true) throw (ParseException)jjte005;}
-                                }
-                                {if (true) throw (Error)jjte005;}
+                                 if (jjtc005) {
+                                   jjtree.clearNodeScope(jjtn005);
+                                   jjtc005 = false;
+                                 } else {
+                                   jjtree.popNode();
+                                 }
+                                 if (jjte005 instanceof RuntimeException) {
+                                   {if (true) throw (RuntimeException)jjte005;}
+                                 }
+                                 if (jjte005 instanceof ParseException) {
+                                   {if (true) throw (ParseException)jjte005;}
+                                 }
+                                 {if (true) throw (Error)jjte005;}
         } finally {
-                                if (jjtc005) {
-                                  jjtree.closeNodeScope(jjtn005,  2);
-                                }
+                                 if (jjtc005) {
+                                   jjtree.closeNodeScope(jjtn005,  2);
+                                 }
         }
         break;
       case NE:
         jj_consume_token(NE);
-                                ASTNE jjtn006 = new ASTNE(JJTNE);
-                                boolean jjtc006 = true;
-                                jjtree.openNodeScope(jjtn006);
+                                 ASTNE jjtn006 = new ASTNE(JJTNE);
+                                 boolean jjtc006 = true;
+                                 jjtree.openNodeScope(jjtn006);
         try {
           SimpleExpression();
         } catch (Throwable jjte006) {
-                                if (jjtc006) {
-                                  jjtree.clearNodeScope(jjtn006);
-                                  jjtc006 = false;
-                                } else {
-                                  jjtree.popNode();
-                                }
-                                if (jjte006 instanceof RuntimeException) {
-                                  {if (true) throw (RuntimeException)jjte006;}
-                                }
-                                if (jjte006 instanceof ParseException) {
-                                  {if (true) throw (ParseException)jjte006;}
-                                }
-                                {if (true) throw (Error)jjte006;}
+                                 if (jjtc006) {
+                                   jjtree.clearNodeScope(jjtn006);
+                                   jjtc006 = false;
+                                 } else {
+                                   jjtree.popNode();
+                                 }
+                                 if (jjte006 instanceof RuntimeException) {
+                                   {if (true) throw (RuntimeException)jjte006;}
+                                 }
+                                 if (jjte006 instanceof ParseException) {
+                                   {if (true) throw (ParseException)jjte006;}
+                                 }
+                                 {if (true) throw (Error)jjte006;}
         } finally {
-                                if (jjtc006) {
-                                  jjtree.closeNodeScope(jjtn006,  2);
-                                }
+                                 if (jjtc006) {
+                                   jjtree.closeNodeScope(jjtn006,  2);
+                                 }
         }
         break;
       default:
@@ -1111,7 +1120,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
                 SymTabEntry variableId = symTabStack.lookup(token.image);
         if (variableId == null) {
                         System.out.println("** Compilation Error: Variable of name: \u005c"" + token.image
-                                    + "\u005c" has not been defined at line " + token.beginLine
+                                    + "\u005c" has not been decleared at line " + token.beginLine
                                     + " column " + token.beginColumn);
                     {if (true) throw new ParseException();}
         }
@@ -1128,19 +1137,46 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
 
   static TypeSpec javaCodeGetAndProcessTypeID(Token t) throws ParseException {
     SymTabEntry typeID = symTabStack.lookup(t.image);
+    if (typeID == null || typeID.getDefinition() != DefinitionImpl.TYPE)
+    {
+      System.out.println("** Compilation Error: Type of name: \u005c"" + t.image
+                                    + "\u005c" does not exist at line " + t.beginLine
+                                    + " column " + t.beginColumn);
+          throw new ParseException();
+    }
     typeID.appendLineNumber(t.beginLine);
     return typeID.getTypeSpec();
   }
 
   static SymTabEntry javaCodeProcessFuncDefn(Token t, TypeSpec type) throws ParseException {
+        if (symTabStack.getLocalSymTab().lookup(t.image) != null) {
+          System.out.println("** Compilation Error: Function of name: \u005c"" + t.image
+                                    + "\u005c" has already been decleared at line " + t.beginLine
+                                    + " column " + t.beginColumn);
+          throw new ParseException();
+        }
     SymTabEntry funcID = symTabStack.enterLocal(t.image);
-    funcID.setDefinition(DefinitionImpl.FUNCTION);
+    funcID.setDefinition(DefinitionImpl.TYPE);
     funcID.appendLineNumber(t.beginLine);
     funcID.setTypeSpec(type); // set return type
     return funcID;
   }
 
   static SymTabEntry javaCodeProcessVariableDeclaration(Token t, TypeSpec type) throws ParseException {
+        if (symTabStack.getLocalSymTab().lookup(t.image) != null) {
+          System.out.println("** Compilation Error: Variable of name: \u005c"" + t.image
+                                    + "\u005c" has already been decleared at line " + t.beginLine
+                                    + " column " + t.beginColumn);
+                throw new ParseException();
+        }
+        if (symTabStack.lookup(t.image) != null
+             && symTabStack.lookup(t.image).getDefinition() == DefinitionImpl.TYPE) {
+          System.out.println("** Compilation Error: : Expected identifier at \u005c"" + t.image
+                                    + "\u005c" line " + t.beginLine
+                                    + " column " + t.beginColumn);
+                throw new ParseException();
+        }
+
     SymTabEntry varID = symTabStack.enterLocal(t.image);
     varID.setDefinition(DefinitionImpl.VARIABLE);
     varID.appendLineNumber(t.beginLine);
@@ -1175,6 +1211,11 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     finally { jj_save(2, xla); }
   }
 
+  static private boolean jj_3_1() {
+    if (jj_3R_8()) return true;
+    return false;
+  }
+
   static private boolean jj_3_3() {
     if (jj_3R_9()) return true;
     return false;
@@ -1199,11 +1240,6 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
   static private boolean jj_3R_9() {
     if (jj_scan_token(IDENTIFIER)) return true;
     if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1() {
-    if (jj_3R_8()) return true;
     return false;
   }
 

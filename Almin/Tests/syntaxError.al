@@ -1,8 +1,6 @@
 main {
 DECLARATION:
-	int int 1;
-	int 1;
-	int i;
+	int int;
 STATEMENT:
 	i = i+1;
 	

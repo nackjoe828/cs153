@@ -14,10 +14,6 @@
 
 .method public static main([Ljava/lang/String;)V
 
-    getstatic SyntaxError/i I
-    ldc 1
-    iadd
-    putstatic SyntaxError/i I
 
 
     return
