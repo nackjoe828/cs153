@@ -34,8 +34,12 @@ public class TypeSetterVisitor extends AlminParserVisitorAdaptor
             SimpleNode child = (SimpleNode) node.jjtGetChild(i);
             TypeSpec childType = child.getTypeSpec();
             
-            if (childType == Predefined.realType) {
+            if (childType == Predefined.stringType) {
+            	type = Predefined.stringType;
+            	break;
+            } else if (childType == Predefined.realType) {
                 type = Predefined.realType;
+                break;
             }
         }
         node.setTypeSpec(type);

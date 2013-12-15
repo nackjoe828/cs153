@@ -161,7 +161,9 @@ TOKEN : {
   | <LPAREN      : "(">
   | <RPAREN      : ")">
   | <LBRACE      : "{">
-  | <RBRACE      : "}">   
+  | <RBRACE      : "}">
+  | <LSQBRACE    : "[">
+  | <RSQBRACE    : "]"> 
   | <LE          : "<="> 
   | <GE          : ">=">  
   | <EQ          : "==">
@@ -178,12 +180,6 @@ TOKEN : {
   | <#DIGIT  : ["0"-"9"]>
   | <#LETTER : ["A"-"Z"] | ["a"-"z"]>
   
-}
-
-/* CHAR tokens */
-TOKEN :
-{
-  <CHAR : <SINGLEQUOTE> (<LETTER>|<DIGIT>) <SINGLEQUOTE>>
 }
 
 /* STRING tokens */
@@ -360,8 +356,21 @@ void VariableDeclaration()  #void :
 {
    try {
   	<IDENTIFIER> { type = javaCodeGetAndProcessTypeID(token); }
-  	<IDENTIFIER> { javaCodeProcessVariableDeclaration(token, type); }
-  	";"
+   (
+  	   <IDENTIFIER>
+       { javaCodeProcessVariableDeclaration(token, type); }
+       |
+       "["
+       <INT> { int arraySize =  Integer.parseInt(token.image); }
+       "]"
+       <IDENTIFIER> {
+         TypeSpec arrayType = new TypeSpecImpl(TypeFormImpl.ARRAY);
+		 arrayType.setAttribute(TypeKeyImpl.ARRAY_ELEMENT_COUNT, arraySize);
+		 arrayType.setAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE, type);
+		 javaCodeProcessVariableDeclaration(token, arrayType);
+       }
+    )
+  	";" 
     } catch (ParseException e) {
      //javaCodeSkipLine();
      if (e.getMessage() != null)
@@ -484,10 +493,6 @@ void Literal() : {}
   <REAL> {
         jjtThis.setTypeSpec(Predefined.realType);
         jjtThis.setAttribute(VALUE, Float.parseFloat(token.image)); 
-  } |
-  <CHAR> {
-        jjtThis.setTypeSpec(Predefined.charType);
-        jjtThis.setAttribute(VALUE, token.image.charAt(1)); 
   } |
   <BOOL> {
         jjtThis.setTypeSpec(Predefined.booleanType);
