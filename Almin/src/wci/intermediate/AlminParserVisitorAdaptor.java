@@ -1,11 +1,8 @@
 package wci.intermediate;
 
 import wci.frontend.ASTASSIGN;
-import wci.frontend.ASTAssignmentStatement;
 import wci.frontend.ASTBlock;
-import wci.frontend.ASTExpression;
 import wci.frontend.ASTEQ;
-import wci.frontend.ASTFactor;
 import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTGE;
 import wci.frontend.ASTGT;
@@ -16,13 +13,8 @@ import wci.frontend.ASTLT;
 import wci.frontend.ASTLiteral;
 import wci.frontend.ASTNE;
 import wci.frontend.ASTReturnStatement;
-import wci.frontend.ASTSimpleExpression;
-import wci.frontend.ASTStatement;
-import wci.frontend.ASTStatements;
 import wci.frontend.ASTStringLiteral;
-import wci.frontend.ASTTerm;
 import wci.frontend.ASTVariable;
-import wci.frontend.ASTWhileStatement;
 import wci.frontend.ASTadd;
 import wci.frontend.ASTand;
 import wci.frontend.ASTdiv;
@@ -149,6 +141,5 @@ public class AlminParserVisitorAdaptor implements AlminParserVisitor
 	public Object visit(ASTStringLiteral node, Object data) {
 		return node.childrenAccept(this, data);
 	}
-
 
 }

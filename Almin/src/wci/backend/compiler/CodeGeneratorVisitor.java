@@ -11,7 +11,7 @@ public class CodeGeneratorVisitor
 {
 	private int labelCount = 1;
 	
-    public Object visit(ASTAssignmentStatement node, Object data)
+    public Object visit(ASTASSIGN node, Object data)
     {
     	String programName        = (String) data;
         SimpleNode variableNode   = (SimpleNode) node.jjtGetChild(0);

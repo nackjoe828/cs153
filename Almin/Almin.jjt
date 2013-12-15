@@ -4,7 +4,7 @@
  */
 
 options {
-	DEBUG_PARSER = true;
+	//DEBUG_PARSER = true;
     IGNORE_CASE=false;
     JJTREE_OUTPUT_DIRECTORY="src/wci/frontend";
     NODE_EXTENDS="wci.intermediate.icodeimpl.ICodeNodeImpl";
@@ -322,9 +322,15 @@ SimpleNode ScopedBlock() #void :
 void VariableDeclaration()  #void :
 { TypeSpec type; }
 {
-  <IDENTIFIER> { type = javaCodeGetAndProcessTypeID(token); }
-  <IDENTIFIER> { javaCodeProcessVariableDeclaration(token, type); }
-  ";"
+   try {
+  	<IDENTIFIER> { type = javaCodeGetAndProcessTypeID(token); }
+  	<IDENTIFIER> { javaCodeProcessVariableDeclaration(token, type); }
+  	";"
+    } catch (ParseException e) {
+     javaCodeSkipLine();
+     if (e.getMessage() != null)
+     	System.out.println("** Compilation Error:" + " " + e.getMessage());
+  } 
 }
 
 void Statements() # void : {}
@@ -334,9 +340,15 @@ void Statements() # void : {}
 
 void Statement() #void : {}
 {
-  LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  Assignment() ";" | FunctionCall() ";"
-  | ScopedBlock() | ControlStatement() |  ReturnStatement() | ";"
+  try  {
+ 	 LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
+  	 Assignment() ";" | FunctionCall() ";"
+  	 | ScopedBlock() | ControlStatement() |  ReturnStatement() | ";"
+  } catch (ParseException e) {
+     javaCodeSkipLine();
+     if (e.getMessage() != null)
+     	System.out.println("** Compilation Error:" + " " + e.getMessage());
+  } 
 }
 
 void Assignment()  # ASSIGN : {}{
@@ -367,14 +379,22 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
 */
 void FunctionCall() : {}
 {
-  <IDENTIFIER> {
-    SymTabEntry funcID = symTabStack.lookup(token.image);
-  	funcID.appendLineNumber(token.beginLine);
-    TypeSpec type = funcID.getTypeSpec();
-    jjtThis.setTypeSpec(type);
-    jjtThis.setAttribute(ID, funcID);
-  }
-   "(" [Expression() ("," Expression())*] ")"}
+  try  {  	<IDENTIFIER> {
+    	SymTabEntry funcID = symTabStack.lookup(token.image);
+    	if (funcID == null) {
+			System.out.println("** Compilation Error: Function of name: \"" + token.image
+		                   + "\" has not been defined at line " + token.beginLine
+		                   + " column " + token.beginColumn);
+			throw new ParseException();
+   		 }
+  		funcID.appendLineNumber(token.beginLine);
+    	TypeSpec type = funcID.getTypeSpec();
+    	jjtThis.setTypeSpec(type);
+    	jjtThis.setAttribute(ID, funcID);
+  	}
+   	"(" [Expression() ("," Expression())*] ")"
+  } catch (ParseException e) {
+    javaCodeSkipLine();  }}
 
 void ReturnStatement() : {}
 {
@@ -444,16 +464,19 @@ void Literal() : {}
 
 void Variable() : {}
 {
-  <IDENTIFIER> {
-    SymTabEntry variableId = symTabStack.lookup(token.image);
-    if (variableId == null) {
-		System.out.println("Error: variable of name: \"" + token.image + "\" has not been defined at line");
-    }
-  	variableId.appendLineNumber(token.beginLine);
-    TypeSpec type = variableId.getTypeSpec();
-    jjtThis.setTypeSpec(type);
-    jjtThis.setAttribute(ID, variableId);
-  }
+  	<IDENTIFIER> {
+  		SymTabEntry variableId = symTabStack.lookup(token.image);
+    	if (variableId == null) {
+			System.out.println("** Compilation Error: Variable of name: \"" + token.image
+		                    + "\" has not been defined at line " + token.beginLine
+		                    + " column " + token.beginColumn);
+		    throw new ParseException();
+    	}
+  		variableId.appendLineNumber(token.beginLine);
+    	TypeSpec type = variableId.getTypeSpec();
+    	jjtThis.setTypeSpec(type);
+    	jjtThis.setAttribute(ID, variableId);
+   }
 }
 
 JAVACODE
@@ -481,4 +504,12 @@ SymTabEntry javaCodeProcessVariableDeclaration(Token t, TypeSpec type) #void
     varID.appendLineNumber(t.beginLine);
     varID.setTypeSpec(type); // set return type
     return varID;
+}
+
+JAVACODE 
+String javaCodeSkipLine() #void
+{
+  Token t = getNextToken();
+  while (t.kind != SEMICOLON) t = getNextToken();
+  return t.image;
 }
