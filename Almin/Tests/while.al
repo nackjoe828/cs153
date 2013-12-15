@@ -7,9 +7,7 @@ STATEMENT:
 	exp = 0;
 	while (exp < 10) 
 	{
-	DECLARATION:
-		real ans;
-	STATEMENT:
+		printf("%d\n", exp);
 		exp=exp+1;
 	}
 }
