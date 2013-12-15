@@ -145,4 +145,9 @@ public class SymTabEntryImpl
     {
         return get(key);
     }
+    
+    @Override
+    public boolean equals(Object o){
+    	return this == o;
+    }
 }

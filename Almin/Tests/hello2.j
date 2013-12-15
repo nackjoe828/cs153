@@ -2,10 +2,10 @@
 .super java/lang/Object
 
 
-.method public static hello(II)V
+.method public static hello(IF)V
 
 getstatic java/lang/System/out Ljava/io/PrintStream;
-ldc " Hello World. %d, %d\n"
+ldc " Hello World. %d, %f\n"
 iconst_2
 anewarray java/lang/Object
 dup
@@ -16,8 +16,8 @@ aastore
 
 dup
 iconst_1
-iload 1
-invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;
+fload 1
+invokestatic java/lang/Float/valueOf(F)Ljava/lang/Float;
 aastore
 
 invokevirtual java/io/PrintStream/printf(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;
@@ -51,8 +51,8 @@ iconst_1
 iconst_2
 iconst_3
 invokestatic HelloWorld2/add(III)I
-iconst_1
-invokestatic HelloWorld2/hello(II)V
+ldc 5.0
+invokestatic HelloWorld2/hello(IF)V
 return
 .limit locals 10
 .limit stack 10

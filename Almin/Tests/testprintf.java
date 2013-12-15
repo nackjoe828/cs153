@@ -4,8 +4,8 @@ public class testprintf{
 		//strint(true, "Hello world");
 	}
 
-	public static int strint(boolean arg2, String arg1){
-        if(arg2) return 1;
-        else return 0;
+	public static String strint(boolean arg2, String arg1){
+        if(arg2) return "yes";
+        else return "no";
 	}
 }

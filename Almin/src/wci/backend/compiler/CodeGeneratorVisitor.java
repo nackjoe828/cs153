@@ -1,5 +1,9 @@
 package wci.backend.compiler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TreeMap;
+
 import wci.frontend.*;
 import wci.intermediate.*;
 import wci.intermediate.symtabimpl.Predefined;
@@ -32,13 +36,20 @@ public class CodeGeneratorVisitor
             CodeGenerator.objectFile.flush();
         }
 
+        ArrayList<SymTabEntry> list = CodeGenerator.paramIndexAndEntry;
         SymTabEntry id = (SymTabEntry) variableNode.getAttribute(ID);
+        int slotNumber = 0;
+        for(SymTabEntry e : list){
+        	if(e == id) break;
+        	slotNumber++;
+        }
         String fieldName = id.getName();
         TypeSpec type = id.getTypeSpec();
-        String typeCode = type == Predefined.integerType ? "I" : "F";
+        String typeCode = type == Predefined.integerType ? "i" : "f";
 
         // Emit the appropriate store instruction.
-        CodeGenerator.objectFile.println("    putstatic " + programName + "/" + fieldName + " " + typeCode);
+        CodeGenerator.objectFile.println("    " + typeCode + "store " + slotNumber + " ;" + "Local/" + fieldName);
+        //CodeGenerator.objectFile.println("    putstatic " + programName + "/" + fieldName);
         //odeGenerator.objectFile.println("getstatic java/lang/System/out Ljava/io/PrintStream;");
         //CodeGenerator.objectFile.println("    getstatic " + programName + "/" + fieldName + " " + typeCode);
         //CodeGenerator.objectFile.println("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
@@ -49,14 +60,22 @@ public class CodeGeneratorVisitor
     
     public Object visit(ASTVariable node, Object data)
     {
+    	//get a map representing which entry goes to which slot
+    	ArrayList<SymTabEntry> list = CodeGenerator.paramIndexAndEntry;
+    	
     	String programName = (String) data;
         SymTabEntry id = (SymTabEntry) node.getAttribute(ID);
-        String fieldName = id.getName();
+        int slotNumber = 0;
+        for(SymTabEntry e : list){
+        	if(e == id) break;
+        	slotNumber++;
+        }
         TypeSpec type = id.getTypeSpec();
-        String typeCode = type == Predefined.integerType ? "I" : "F";
+        String typeCode = type == Predefined.integerType ? "i" : "f";
 
         // Emit the appropriate load instruction.
-        CodeGenerator.objectFile.println("    getstatic " + programName + "/" + fieldName + " " + typeCode);
+        //CodeGenerator.objectFile.println("    getstatic " + programName + "/" + fieldName + " " + typeCode);
+        CodeGenerator.objectFile.println("    " + typeCode + "load " + slotNumber + "  ;" + "Local/" + id.getName());
         CodeGenerator.objectFile.flush();
 
         return data;
@@ -262,6 +281,43 @@ public class CodeGeneratorVisitor
     	if(type == Predefined.integerType) typeCode = "I";
     	else if(type == Predefined.realType) typeCode = "F";
     	else typeCode = "";
+    	
+    	//generate code for printf
+    	if(fieldName.equals("printf")){
+    		CodeGenerator.objectFile.println("    getstatic java/lang/System/out Ljava/io/PrintStream;");
+    		//code for string
+    		SimpleNode stringNode = (SimpleNode) node.jjtGetChild(0);
+    		stringNode.jjtAccept(this, data);
+    		//code for object array
+    		int objArrayCount = node.jjtGetNumChildren()-1;
+    		CodeGenerator.objectFile.println("    ldc " + objArrayCount);
+    		CodeGenerator.objectFile.println("    anewarray java/lang/Object");
+    		CodeGenerator.objectFile.println();
+    		for(int i = 0; i < objArrayCount; i++){
+    			CodeGenerator.objectFile.println("    dup");
+    			CodeGenerator.objectFile.println("    ldc " + i);
+    			//needed for checking type
+    			ICodeNode iNode = (ICodeNode) node.jjtGetChild(i+1);
+    			SimpleNode objNode = (SimpleNode) node.jjtGetChild(i+1);
+    			objNode.jjtAccept(this, data);
+    			type = iNode.getTypeSpec();
+    			
+        		if(type == Predefined.integerType){
+        			CodeGenerator.objectFile.println("    invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;");
+        		}
+        		else if(type == Predefined.realType){
+        			CodeGenerator.objectFile.println("    invokestatic java/lang/Float/valueOf(F)Ljava/lang/Float;");
+        		}
+    			
+    			CodeGenerator.objectFile.println("    aastore");
+    			CodeGenerator.objectFile.println();
+    		}
+    		CodeGenerator.objectFile.print("    invokevirtual java/io/PrintStream/printf(Ljava/lang/String;[");
+    		CodeGenerator.objectFile.println("Ljava/lang/Object;)Ljava/io/PrintStream;");
+    		CodeGenerator.objectFile.println("   pop");
+    		CodeGenerator.objectFile.println("");
+    		return data;
+    	}
     	
     	//check type id for each parameters
     	int argCount = node.jjtGetNumChildren();
