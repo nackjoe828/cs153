@@ -25,6 +25,7 @@ public interface AlminParserTreeConstants
   public int JJTSTRINGLITERAL = 19;
   public int JJTLITERAL = 20;
   public int JJTVARIABLE = 21;
+  public int JJTFIELD = 22;
 
 
   public String[] jjtNodeName = {
@@ -50,6 +51,7 @@ public interface AlminParserTreeConstants
     "StringLiteral",
     "Literal",
     "Variable",
+    "Field",
   };
 }
-/* JavaCC - OriginalChecksum=32eebf3f3ec29be84b819ba9ae1241a1 (do not edit this line) */
+/* JavaCC - OriginalChecksum=d409f6c6db2bf457de03d3042ea97825 (do not edit this line) */

@@ -144,6 +144,6 @@ public class TypeSetterVisitor extends AlminParserVisitorAdaptor
 	public Object visit(ASTStringLiteral node, Object data) {
 		return data;
 	}
-
+	
 	
 }
