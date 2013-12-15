@@ -6,6 +6,9 @@ TYPE:
 		real z; 
 	}
 
+VAR:
+	vector v;
+
 FUNC:
 	main {
 	VAR: 
@@ -21,5 +24,5 @@ FUNC:
 		v2.y = 2;
 		v2.z = 1;
 		
-		v3 = v1 + v2;
+		v = v1 + v2;
 	}

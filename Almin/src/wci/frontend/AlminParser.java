@@ -131,11 +131,37 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
             }
             TypeDeclaration();
           }
-          jj_consume_token(FUNC);
-          jj_consume_token(COLON);
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case VAR:
+            jj_consume_token(VAR);
+            jj_consume_token(COLON);
+            label_2:
+            while (true) {
+              switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+              case IDENTIFIER:
+                ;
+                break;
+              default:
+                jj_la1[1] = jj_gen;
+                break label_2;
+              }
+              VariableDeclaration();
+            }
+            jj_consume_token(FUNC);
+            jj_consume_token(COLON);
+            break;
+          case FUNC:
+            jj_consume_token(FUNC);
+            jj_consume_token(COLON);
+            break;
+          default:
+            jj_la1[2] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
           break;
         default:
-          jj_la1[1] = jj_gen;
+          jj_la1[3] = jj_gen;
           ;
         }
         rootNode = FunctionDefinitions();
@@ -163,15 +189,15 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           type = typeID.getTypeSpec();
           type.setAttribute(TypeKeyImpl.RECORD_SYMTAB, symTabStack.push());
       jj_consume_token(LBRACE);
-      label_2:
+      label_3:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case IDENTIFIER:
           ;
           break;
         default:
-          jj_la1[2] = jj_gen;
-          break label_2;
+          jj_la1[4] = jj_gen;
+          break label_3;
         }
         VariableDeclaration();
       }
@@ -186,15 +212,15 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     trace_call("FunctionDefinitions");
     try {
   SimpleNode rootNode;
-      label_3:
+      label_4:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case IDENTIFIER:
           ;
           break;
         default:
-          jj_la1[3] = jj_gen;
-          break label_3;
+          jj_la1[5] = jj_gen;
+          break label_4;
         }
         FuncDefn();
       }
@@ -250,15 +276,15 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
                        type = javaCodeGetAndProcessTypeID(token);
         jj_consume_token(IDENTIFIER);
                        paramList.add(javaCodeProcessVariableDeclaration(token, type));
-        label_4:
+        label_5:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
           case COMMA:
             ;
             break;
           default:
-            jj_la1[4] = jj_gen;
-            break label_4;
+            jj_la1[6] = jj_gen;
+            break label_5;
           }
           jj_consume_token(COMMA);
           jj_consume_token(IDENTIFIER);
@@ -268,7 +294,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
         }
         break;
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[7] = jj_gen;
         ;
       }
       jj_consume_token(RPAREN);
@@ -296,15 +322,15 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
         case VAR:
           jj_consume_token(VAR);
           jj_consume_token(COLON);
-          label_5:
+          label_6:
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
             case IDENTIFIER:
               ;
               break;
             default:
-              jj_la1[6] = jj_gen;
-              break label_5;
+              jj_la1[8] = jj_gen;
+              break label_6;
             }
             VariableDeclaration();
           }
@@ -312,7 +338,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           jj_consume_token(COLON);
           break;
         default:
-          jj_la1[7] = jj_gen;
+          jj_la1[9] = jj_gen;
           ;
         }
         Statements();
@@ -382,7 +408,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
   static final public void Statements() throws ParseException {
     trace_call("Statements");
     try {
-      label_6:
+      label_7:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case IF:
@@ -394,8 +420,8 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           ;
           break;
         default:
-          jj_la1[8] = jj_gen;
-          break label_6;
+          jj_la1[10] = jj_gen;
+          break label_7;
         }
         Statement();
       }
@@ -431,7 +457,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
             jj_consume_token(SEMICOLON);
             break;
           default:
-            jj_la1[9] = jj_gen;
+            jj_la1[11] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -492,7 +518,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
         WhileLoop();
         break;
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -520,7 +546,7 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
           Statement();
           break;
         default:
-          jj_la1[11] = jj_gen;
+          jj_la1[13] = jj_gen;
           ;
         }
       } catch (Throwable jjte000) {
@@ -625,22 +651,22 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
         case INT:
         case REAL:
           Expression();
-          label_7:
+          label_8:
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
             case COMMA:
               ;
               break;
             default:
-              jj_la1[12] = jj_gen;
-              break label_7;
+              jj_la1[14] = jj_gen;
+              break label_8;
             }
             jj_consume_token(COMMA);
             Expression();
           }
           break;
         default:
-          jj_la1[13] = jj_gen;
+          jj_la1[15] = jj_gen;
           ;
         }
         jj_consume_token(RPAREN);
@@ -690,7 +716,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
           Expression();
           break;
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[16] = jj_gen;
           ;
         }
         jj_consume_token(SEMICOLON);
@@ -726,7 +752,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
         StringLiteral();
         break;
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[17] = jj_gen;
         if (jj_2_2(2)) {
           Assignment();
         } else {
@@ -742,7 +768,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
             BooleanExpression();
             break;
           default:
-            jj_la1[16] = jj_gen;
+            jj_la1[18] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -928,13 +954,13 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
           }
           break;
         default:
-          jj_la1[17] = jj_gen;
+          jj_la1[19] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         break;
       default:
-        jj_la1[18] = jj_gen;
+        jj_la1[20] = jj_gen;
         ;
       }
     } finally {
@@ -946,7 +972,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     trace_call("SimpleExpression");
     try {
       Term();
-      label_8:
+      label_9:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case MINUS:
@@ -955,8 +981,8 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
           ;
           break;
         default:
-          jj_la1[19] = jj_gen;
-          break label_8;
+          jj_la1[21] = jj_gen;
+          break label_9;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case PLUS:
@@ -1041,7 +1067,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
           }
           break;
         default:
-          jj_la1[20] = jj_gen;
+          jj_la1[22] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1055,7 +1081,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     trace_call("Term");
     try {
       Factor();
-      label_9:
+      label_10:
       while (true) {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STAR:
@@ -1064,8 +1090,8 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
           ;
           break;
         default:
-          jj_la1[21] = jj_gen;
-          break label_9;
+          jj_la1[23] = jj_gen;
+          break label_10;
         }
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STAR:
@@ -1150,7 +1176,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
           }
           break;
         default:
-          jj_la1[22] = jj_gen;
+          jj_la1[24] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1190,7 +1216,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
           Factor();
           break;
         default:
-          jj_la1[23] = jj_gen;
+          jj_la1[25] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1261,7 +1287,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
         jjtn000.setAttribute(VALUE, Boolean.valueOf(token.image));
           break;
         default:
-          jj_la1[24] = jj_gen;
+          jj_la1[26] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1324,7 +1350,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     jjtn000.jjtAddChild(fieldNode, jjtn000.jjtGetNumChildren());
           break;
         default:
-          jj_la1[25] = jj_gen;
+          jj_la1[27] = jj_gen;
           ;
         }
       } catch (Throwable jjte000) {
@@ -1493,42 +1519,42 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
   }
 
   static private boolean jj_3_2() {
-    if (jj_3R_10()) return true;
+    if (jj_3R_11()) return true;
     return false;
   }
 
   static private boolean jj_3_1() {
-    if (jj_3R_10()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_11() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LPAREN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_10() {
-    if (jj_3R_12()) return true;
-    if (jj_scan_token(ASSIGN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_13() {
-    if (jj_scan_token(DOT)) return true;
+    if (jj_3R_11()) return true;
     return false;
   }
 
   static private boolean jj_3R_12() {
     if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_11() {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(ASSIGN)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_14() {
+    if (jj_scan_token(DOT)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_13() {
+    if (jj_scan_token(IDENTIFIER)) return true;
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3R_13()) jj_scanpos = xsp;
+    if (jj_3R_14()) jj_scanpos = xsp;
     return false;
   }
 
   static private boolean jj_3_3() {
-    if (jj_3R_11()) return true;
+    if (jj_3R_12()) return true;
     return false;
   }
 
@@ -1544,7 +1570,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
   static private Token jj_scanpos, jj_lastpos;
   static private int jj_la;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[26];
+  static final private int[] jj_la1 = new int[28];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1552,10 +1578,10 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x100,0x0,0x0,0x10000000,0x0,0x0,0x800,0x815000,0x815000,0x5000,0x2000,0x10000000,0x80040000,0x80040000,0x0,0x80040000,0x6000000,0x6000000,0xc0000,0xc0000,0x220000,0x220000,0x80040000,0x0,0x8000000,};
+      jj_la1_0 = new int[] {0x0,0x0,0xa00,0x100,0x0,0x0,0x10000000,0x0,0x0,0x800,0x815000,0x815000,0x5000,0x2000,0x10000000,0x80040000,0x80040000,0x0,0x80040000,0x6000000,0x6000000,0xc0000,0xc0000,0x220000,0x220000,0x80040000,0x0,0x8000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x400,0x0,0x400,0x400,0x0,0x400,0x400,0x0,0x402,0x402,0x0,0x0,0x0,0x3e600,0x3e600,0x4000,0x3a600,0x78,0x78,0x100,0x100,0x80,0x80,0x3a600,0x3a000,0x0,};
+      jj_la1_1 = new int[] {0x400,0x400,0x0,0x0,0x400,0x400,0x0,0x400,0x400,0x0,0x402,0x402,0x0,0x0,0x0,0x3e600,0x3e600,0x4000,0x3a600,0x78,0x78,0x100,0x100,0x80,0x80,0x3a600,0x3a000,0x0,};
    }
   static final private JJCalls[] jj_2_rtns = new JJCalls[3];
   static private boolean jj_rescan = false;
@@ -1579,7 +1605,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1595,7 +1621,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1613,7 +1639,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1625,7 +1651,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1642,7 +1668,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1653,7 +1679,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     jj_ntk = -1;
     jjtree.reset();
     jj_gen = 0;
-    for (int i = 0; i < 26; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1772,7 +1798,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < 28; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

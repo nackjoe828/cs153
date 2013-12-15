@@ -241,7 +241,8 @@ SimpleNode Program(String programName)       :
   try {
     [<TYPE> ":"
      (TypeDeclaration())*
-     <FUNC> ":"]
+     
+     (<VAR> ":"  (VariableDeclaration())*   <FUNC> ":"      | <FUNC> ":")]
     rootNode = FunctionDefinitions()
     <EOF>
   } catch (ParseException e) {

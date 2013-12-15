@@ -29,7 +29,7 @@
     fload 0  ;Local/v1
     fload 1  ;Local/v2
     iadd
-    fstore 2 ;Local/v3
+    fstore 3 ;Local/v
 
 
     return
