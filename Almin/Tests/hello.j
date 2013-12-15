@@ -26,6 +26,7 @@ return
 
 .method public static main([Ljava/lang/String;)V
 invokestatic HelloWorld/hello()V
+
 return
 .limit locals 10
 .limit stack 10

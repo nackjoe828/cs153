@@ -45,7 +45,11 @@ public class CodeGeneratorVisitor
         }
         String fieldName = id.getName();
         TypeSpec type = id.getTypeSpec();
-        String typeCode = type == Predefined.integerType ? "i" : "f";
+        String typeCode;
+        if(type == Predefined.integerType) typeCode = "i";
+        else if(type == Predefined.realType) typeCode = "f";
+        else if(type == Predefined.stringType) typeCode = "a";
+        else typeCode = "i";
 
         // Emit the appropriate store instruction.
         CodeGenerator.objectFile.println("    " + typeCode + "store " + slotNumber + " ;" + "Local/" + fieldName);
@@ -71,7 +75,11 @@ public class CodeGeneratorVisitor
         	slotNumber++;
         }
         TypeSpec type = id.getTypeSpec();
-        String typeCode = type == Predefined.integerType ? "i" : "f";
+        String typeCode;
+        if(type == Predefined.integerType) typeCode = "i";
+        else if(type == Predefined.realType) typeCode = "i";
+        else if(type == Predefined.stringType) typeCode = "a";
+        else typeCode = "i";
 
         // Emit the appropriate load instruction.
         //CodeGenerator.objectFile.println("    getstatic " + programName + "/" + fieldName + " " + typeCode);
@@ -127,21 +135,51 @@ public class CodeGeneratorVisitor
         // Get the addition type.
         TypeSpec type = node.getTypeSpec();
         String typePrefix = (type == Predefined.integerType) ? "i" : "f";
+        
+        //if first add is string type, invoke append
+        if(type == Predefined.stringType){
+        	CodeGenerator.objectFile.println("    new java/lang/StringBuilder");
+        	CodeGenerator.objectFile.println("    dup");
+        	//create string builder object with empty string
+        	CodeGenerator.objectFile.println("    ldc \"\"");
+        	CodeGenerator.objectFile.println("    invokenonvirtual java/lang/StringBuilder/<init>(Ljava/lang/String;)V");
+        	
+        	//append first operand
+        	addend0Node.jjtAccept(this, data);
+        	if(type0 == Predefined.stringType)
+        		CodeGenerator.objectFile.println("    invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+        	if(type0 == Predefined.integerType)
+        		CodeGenerator.objectFile.println("    invokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;");
+        	else if(type0 == Predefined.realType)
+        		CodeGenerator.objectFile.println("    invokevirtual java/lang/StringBuilder/append(F)Ljava/lang/StringBuilder;");
+        	
+        	//append second operand
+        	addend1Node.jjtAccept(this, data);
+        	if(type1 == Predefined.stringType)
+        		CodeGenerator.objectFile.println("    invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+        	if(type1 == Predefined.integerType)
+        		CodeGenerator.objectFile.println("    invokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;");
+        	else if(type1 == Predefined.realType)
+        		CodeGenerator.objectFile.println("    invokevirtual java/lang/StringBuilder/append(F)Ljava/lang/StringBuilder;");
+        	
+        	CodeGenerator.objectFile.println("    invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+        	return data;
+        }
 
         // Emit code for the first expression
         // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type1 == Predefined.realType) &&
+        if ((type == Predefined.realType) &&
             (type0 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
             CodeGenerator.objectFile.flush();
         }
-
+        
         // Emit code for the second expression
         // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type0 == Predefined.realType) &&
+        if ((type == Predefined.realType) &&
             (type1 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -170,7 +208,7 @@ public class CodeGeneratorVisitor
         // Emit code for the first expression
         // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type1 == Predefined.realType) &&
+        if ((type == Predefined.realType) &&
             (type0 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -180,7 +218,7 @@ public class CodeGeneratorVisitor
         // Emit code for the second expression
         // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type0 == Predefined.realType) &&
+        if ((type == Predefined.realType) &&
             (type1 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -209,7 +247,7 @@ public class CodeGeneratorVisitor
         // Emit code for the first expression
         // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type1 == Predefined.realType) &&
+        if ((type == Predefined.realType) &&
             (type0 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -219,7 +257,7 @@ public class CodeGeneratorVisitor
         // Emit code for the second expression
         // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type0 == Predefined.realType) &&
+        if ((type == Predefined.realType) &&
             (type1 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -248,7 +286,7 @@ public class CodeGeneratorVisitor
         // Emit code for the first expression
         // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type1 == Predefined.realType) &&
+        if ((type == Predefined.realType) &&
             (type0 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -258,7 +296,7 @@ public class CodeGeneratorVisitor
         // Emit code for the second expression
         // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type0 == Predefined.realType) &&
+        if ((type == Predefined.realType) &&
             (type1 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -327,8 +365,22 @@ public class CodeGeneratorVisitor
     		currentChildNode = (SimpleNode) node.jjtGetChild(i);
     		currentChildNode.jjtAccept(this, data);
     		TypeSpec currentChildType = currentChildNode.getTypeSpec();
-        	if(currentChildType == Predefined.integerType) typeCodes[i] = "I";
-        	if(currentChildType == Predefined.realType) typeCodes[i] = "F";
+    		if(currentChildType == Predefined.integerType){
+    			typeCodes[i] = "I";
+    		}
+    		else if(currentChildType == Predefined.realType){
+    			typeCodes[i] = "F";
+    		}
+    		else if(currentChildType == Predefined.charType){
+    			typeCodes[i] = "C";
+    		}
+    		else if(currentChildType == Predefined.stringType){
+    			typeCodes[i] = "Ljava/lang/String;";
+    		}
+    		else if(currentChildType == Predefined.booleanType){
+    			typeCodes[i] = "Z";
+    		}
+    		else typeCodes[i] = "error";
     	}
     	
     	//generate code to call function
@@ -336,6 +388,26 @@ public class CodeGeneratorVisitor
     	for(int i = 0; i < argCount; i++){
     		signature += typeCodes[i];
     	}
+
+    	//append return type
+		if(type == Predefined.integerType){
+			typeCode = "I";
+		}
+		else if(type == Predefined.realType){
+			typeCode = "F";
+		}
+		else if(type == Predefined.charType){
+			typeCode = "C";
+		}
+		else if(type == Predefined.stringType){
+			typeCode = "Ljava/lang/String;";
+		}
+		else if(type == Predefined.booleanType){
+			typeCode = "Z";
+		}
+		else typeCode = "error";
+    	
+    	
     	signature += ")" + typeCode;
     	CodeGenerator.objectFile.println("    invokestatic " + signature);
     	
