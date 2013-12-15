@@ -1,4 +1,4 @@
-.class public While
+.class public DateAnagram
 .super java/lang/Object
 
 .field private static _runTimer LRunTimer;
@@ -15,49 +15,41 @@
 .limit stack 1
 .end method
 
+.method public static retstr()Ljava/lang/String;
+    ldc "Hello"
+    areturn
+
+
+.limit locals 0
+.limit stack  16
+.end method
+
 .method public static main([Ljava/lang/String;)V
 
     new	 RunTimer
     dup
     invokenonvirtual	RunTimer/<init>()V
-    putstatic	While/_runTimer LRunTimer;
+    putstatic	DateAnagram/_runTimer LRunTimer;
     new	 PascalTextIn
     dup
     invokenonvirtual	PascalTextIn/<init>()V
-    putstatic	While/_standardIn LPascalTextIn;
+    putstatic	DateAnagram/_standardIn LPascalTextIn;
 
-    ldc 0.0
-    fstore 0 ;Local/b
     ldc 0
-    istore 1 ;Local/exp
-L002:
-    iload 1  ;Local/exp
-    ldc 10
-    if_icmplt L003
-    goto L004
-L003:
+    istore 0 ;Local/i
+    invokestatic DateAnagram/retstr()Ljava/lang/String;
+    astore 1 ;Local/str
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "%d\n"
-    ldc 1
-    anewarray java/lang/Object
-
-    dup
+    iconst_4
+invokestatic java/lang/Integer/toString(I)Ljava/lang/String;
     ldc 0
-    iload 1  ;Local/exp
-    invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;
-    aastore
+    anewarray java/lang/Object
 
     invokevirtual java/io/PrintStream/printf(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;
    pop
 
-    iload 1  ;Local/exp
-    ldc 1
-    iadd
-    istore 1 ;Local/exp
-    goto L002
-L004:
 
-    getstatic	While/_runTimer LRunTimer;
+    getstatic	DateAnagram/_runTimer LRunTimer;
     invokevirtual	RunTimer.printElapsedTime()V
 
     return

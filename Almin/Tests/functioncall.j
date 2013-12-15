@@ -1,6 +1,9 @@
 .class public Functioncall
 .super java/lang/Object
 
+.field private static _runTimer LRunTimer;
+.field private static _standardIn LPascalTextIn;
+
 
 .method public <init>()V
 
@@ -96,6 +99,15 @@ L003:
 
 .method public static main([Ljava/lang/String;)V
 
+    new	 RunTimer
+    dup
+    invokenonvirtual	RunTimer/<init>()V
+    putstatic	Functioncall/_runTimer LRunTimer;
+    new	 PascalTextIn
+    dup
+    invokenonvirtual	PascalTextIn/<init>()V
+    putstatic	Functioncall/_standardIn LPascalTextIn;
+
     ldc 2
     i2f
     fstore 1 ;Local/b
@@ -146,6 +158,8 @@ L003:
     goto L002
 L004:
 
+    getstatic	Functioncall/_runTimer LRunTimer;
+    invokevirtual	RunTimer.printElapsedTime()V
 
     return
 

@@ -65,24 +65,12 @@ public class CodeGenerator extends Backend
         objectFile.println(".class public " + programName);
         objectFile.println(".super java/lang/Object");
         objectFile.println();
-        /*
+        
         // Generate code for the timer and standard input fields.
         objectFile.println(".field private static _runTimer LRunTimer;");
         objectFile.println(".field private static _standardIn LPascalTextIn;");
-        objectFile.println();*/
-        /*
-        // Generate code for fields.
-        for (SymTabEntry id : locals) {
-            Definition defn = id.getDefinition();
-            
-            if (defn == VARIABLE) {
-                String fieldName = id.getName();
-                TypeSpec type = id.getTypeSpec();
-                String typeCode = type == Predefined.integerType ? "I" : "F";
-                objectFile.println(".field private static " + fieldName + 
-                		           " " + typeCode);
-            }
-        }*/
+        objectFile.println();
+
         objectFile.println();
         
         // Generate the class constructor.
@@ -179,7 +167,7 @@ public class CodeGenerator extends Backend
         // Generate the main method header.
         objectFile.println(".method public static main([Ljava/lang/String;)V");
         objectFile.println();
-        /*
+        
         // Generate the main method prologue.
         objectFile.println("    new	 RunTimer");
         objectFile.println("    dup");
@@ -192,7 +180,7 @@ public class CodeGenerator extends Backend
         objectFile.println("    putstatic	" + programName +
         		           "/_standardIn LPascalTextIn;");
         objectFile.println();
-        objectFile.flush();*/
+        objectFile.flush();
         
         //variable for main
         paramIndexAndEntry = new ArrayList<SymTabEntry>();
@@ -211,8 +199,8 @@ public class CodeGenerator extends Backend
         objectFile.println();
 
         // Generate the main method epilogue.
-        //objectFile.println("    getstatic	" + programName + "/_runTimer LRunTimer;");
-        //objectFile.println("    invokevirtual	RunTimer.printElapsedTime()V");
+        objectFile.println("    getstatic	" + programName + "/_runTimer LRunTimer;");
+        objectFile.println("    invokevirtual	RunTimer.printElapsedTime()V");
         objectFile.println();
         objectFile.println("    return");
         objectFile.println();
