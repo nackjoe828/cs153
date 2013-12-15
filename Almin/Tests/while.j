@@ -21,13 +21,9 @@
 L002:
     iload 1  ;Local/exp
     ldc 10
-    if_icmpgt L003
-    iconst_0
+    if_icmplt L003
     goto L004
 L003:
-    iconst_1
-L004:
-    ifne L005
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc "%d\n"
     ldc 1
@@ -47,7 +43,7 @@ L004:
     iadd
     istore 1 ;Local/exp
     goto L002
-L005:
+L004:
 
 
     return

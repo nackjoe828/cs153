@@ -349,12 +349,8 @@ public class CodeGeneratorVisitor
     	//store the label number before being incremented
     	int storedNumber = labelCount;
     	
-    	CodeGenerator.objectFile.println("    iconst_0");
     	CodeGenerator.objectFile.println("    goto L" + String.format("%03d", ++labelCount));
     	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
-    	CodeGenerator.objectFile.println("    iconst_1");
-    	CodeGenerator.objectFile.println("L" + String.format("%03d", labelCount) + ":");
-    	CodeGenerator.objectFile.println("    ifeq L" + String.format("%03d", ++labelCount));
     	storedNumber = labelCount;
     	
     	// execute if block
@@ -363,7 +359,7 @@ public class CodeGeneratorVisitor
     	
     	// if else block follows, execute
     	if(node.jjtGetNumChildren() == 3){
-    		CodeGenerator.objectFile.println("    goto L" + String.format("%03d", ++labelCount) + ":");
+    		CodeGenerator.objectFile.println("    goto L" + String.format("%03d", ++labelCount));
     		CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
     		storedNumber = labelCount;
     		SimpleNode elseBlockNode = (SimpleNode) node.jjtGetChild(2);
@@ -384,12 +380,8 @@ public class CodeGeneratorVisitor
     	conditionNode.jjtAccept(this, data);
     	
     	int storedNumber = labelCount;
-    	CodeGenerator.objectFile.println("    iconst_0");
     	CodeGenerator.objectFile.println("    goto L" + String.format("%03d", ++labelCount));
     	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
-    	CodeGenerator.objectFile.println("    iconst_1");
-    	CodeGenerator.objectFile.println("L" + String.format("%03d", labelCount) + ":");
-    	CodeGenerator.objectFile.println("    ifne L" + String.format("%03d", ++labelCount));
     	storedNumber = labelCount;
     	
     	SimpleNode blockNode = (SimpleNode) node.jjtGetChild(1);
@@ -432,7 +424,7 @@ public class CodeGeneratorVisitor
     	rightHand.jjtAccept(this, data);
     	TypeSpec type = leftHand.getTypeSpec();
     	String typePrefix = (type == Predefined.integerType) ? "i" : "f";
-    	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmpgt L" + String.format("%03d", ++labelCount));
+    	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmplt L" + String.format("%03d", ++labelCount));
     	return data;
     }
     
@@ -444,7 +436,7 @@ public class CodeGeneratorVisitor
     	rightHand.jjtAccept(this, data);
     	TypeSpec type = leftHand.getTypeSpec();
     	String typePrefix = (type == Predefined.integerType) ? "i" : "f";
-    	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmpge L" + String.format("%03d", ++labelCount));
+    	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmple L" + String.format("%03d", ++labelCount));
     	return data;
     }
     
@@ -479,5 +471,35 @@ public class CodeGeneratorVisitor
     		sNode.jjtAccept(this, data);
     	}
     	return data;
+    }
+    
+    public Object visit(ASTReturnStatement node, Object data){
+		SimpleNode retNode = (SimpleNode) node.jjtGetChild(0);
+		
+		retNode.jjtAccept(this, data);
+		TypeSpec retType = retNode.getTypeSpec();
+		String typeCode;
+		if(retType == Predefined.integerType){
+			typeCode = "i";
+		}
+		else if(retType == Predefined.realType){
+			typeCode = "f";
+		}
+		else if(retType == Predefined.charType){
+			typeCode = "i";
+		}
+		else if(retType == Predefined.stringType){
+			typeCode = "a";
+		}
+		else if(retType == Predefined.booleanType){
+			typeCode = "i";
+		}
+		//void
+		else
+			typeCode = "";
+		CodeGenerator.objectFile.println("    " + typeCode + "return\n\n");
+		CodeGenerator.objectFile.flush();
+		
+		return data;
     }
 }
