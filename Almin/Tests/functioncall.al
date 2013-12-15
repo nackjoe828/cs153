@@ -1,7 +1,3 @@
-void proc1() {
-// does nothing
-}
-
 // pow computes b^exp
 real pow(real b, int exp) {
 DECLARATION:
