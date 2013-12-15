@@ -26,10 +26,7 @@ STATEMENT:
 	exp = 0;
 	while (exp < 10) 
 	{
-	DECLARATION:
-		real ans;
-	STATEMENT:
-		ans = pow(b, exp);
+		b = pow(b, exp);
 		exp=exp+1;
 	}
 	if (exp == 0)

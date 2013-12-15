@@ -56,8 +56,7 @@ public class CodeGeneratorVisitor
         String typeCode = type == Predefined.integerType ? "I" : "F";
 
         // Emit the appropriate load instruction.
-        CodeGenerator.objectFile.println("    getstatic " + programName +
-                "/" + fieldName + " " + typeCode);
+        CodeGenerator.objectFile.println("    getstatic " + programName + "/" + fieldName + " " + typeCode);
         CodeGenerator.objectFile.flush();
 
         return data;
