@@ -26,7 +26,7 @@ public class CodeGeneratorVisitor
         TypeSpec expressionType = expressionNode.getTypeSpec();
 
         // Get the assignment target type.
-        TypeSpec targetType = node.getTypeSpec();
+        TypeSpec targetType = variableNode.getTypeSpec();
 
         // Convert an integer value to float if necessary.
         if ((targetType == Predefined.realType) &&
@@ -131,7 +131,7 @@ public class CodeGeneratorVisitor
         // Emit code for the first expression
         // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
+        if ((type1 == Predefined.realType) &&
             (type0 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -141,7 +141,7 @@ public class CodeGeneratorVisitor
         // Emit code for the second expression
         // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
+        if ((type0 == Predefined.realType) &&
             (type1 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -170,7 +170,7 @@ public class CodeGeneratorVisitor
         // Emit code for the first expression
         // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
+        if ((type1 == Predefined.realType) &&
             (type0 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -180,7 +180,7 @@ public class CodeGeneratorVisitor
         // Emit code for the second expression
         // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
+        if ((type0 == Predefined.realType) &&
             (type1 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -209,7 +209,7 @@ public class CodeGeneratorVisitor
         // Emit code for the first expression
         // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
+        if ((type1 == Predefined.realType) &&
             (type0 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -219,7 +219,7 @@ public class CodeGeneratorVisitor
         // Emit code for the second expression
         // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
+        if ((type0 == Predefined.realType) &&
             (type1 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -248,7 +248,7 @@ public class CodeGeneratorVisitor
         // Emit code for the first expression
         // with type conversion if necessary.
         addend0Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
+        if ((type1 == Predefined.realType) &&
             (type0 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
@@ -258,7 +258,7 @@ public class CodeGeneratorVisitor
         // Emit code for the second expression
         // with type conversion if necessary.
         addend1Node.jjtAccept(this, data);
-        if ((type == Predefined.realType) &&
+        if ((type0 == Predefined.realType) &&
             (type1 == Predefined.integerType))
         {
             CodeGenerator.objectFile.println("    i2f");
