@@ -1,9 +1,9 @@
 main {
-DECLARATION: 
+VAR: 
 	int i;
 	real r;
 	real ans;
-STATEMENT:
+BODY:
 	i = 1;
 	r = 5.0;
 	ans = i + r;

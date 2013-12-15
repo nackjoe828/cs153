@@ -4,7 +4,7 @@
  */
 
 options {
-	//DEBUG_PARSER = true;
+	DEBUG_PARSER = true;
     IGNORE_CASE=false;
     JJTREE_OUTPUT_DIRECTORY="src/wci/frontend";
     NODE_EXTENDS="wci.intermediate.icodeimpl.ICodeNodeImpl";
@@ -20,6 +20,7 @@ import java.io.*;
 
 import wci.intermediate.*;
 import wci.intermediate.symtabimpl.*;
+import wci.intermediate.typeimpl.*;
 import wci.backend.*;
 import wci.util.*;
 
@@ -129,14 +130,16 @@ SKIP : {
 
 /* RESERVED WORDS */
 TOKEN : {
-    <MAIN        : "main">
-  | <STATEMENT   : "STATEMENT">
-  | <DECLARATION : "DECLARATION">
-  | <IF          : "if">
-  | <ELSE        : "else">
-  | <WHILE       : "while">
-  | <FOR         : "for">
-  | <RETURN      : "return">                    
+    <MAIN    : "main">
+  | <TYPE    : "TYPE">
+  | <FUNC    : "FUNC">
+  | <BODY    : "BODY">
+  | <VAR     : "VAR">
+  | <IF      : "if">
+  | <ELSE    : "else">
+  | <WHILE   : "while">
+  | <FOR     : "for">
+  | <RETURN  : "return">                    
 }
 
 /* special symbol tokens */
@@ -158,7 +161,9 @@ TOKEN : {
   | <LPAREN      : "(">
   | <RPAREN      : ")">
   | <LBRACE      : "{">
-  | <RBRACE      : "}">   
+  | <RBRACE      : "}">
+  | <LSQBRACE    : "[">
+  | <RSQBRACE    : "]"> 
   | <LE          : "<="> 
   | <GE          : ">=">  
   | <EQ          : "==">
@@ -175,12 +180,6 @@ TOKEN : {
   | <#DIGIT  : ["0"-"9"]>
   | <#LETTER : ["A"-"Z"] | ["a"-"z"]>
   
-}
-
-/* CHAR tokens */
-TOKEN :
-{
-  <CHAR : <SINGLEQUOTE> (<LETTER>|<DIGIT>) <SINGLEQUOTE>>
 }
 
 /* STRING tokens */
@@ -231,7 +230,11 @@ SimpleNode Program(String programName) #void :
   programId.setAttribute(ROUTINE_ROUTINES, new ArrayList<SymTabEntry>());
 }
 {
-  try { 
+  try {
+    [<TYPE> ":"
+     (TypeDeclaration())*
+     
+     (<VAR> ":"  (VariableDeclaration())*   <FUNC> ":"      | <FUNC> ":")]
     rootNode = FunctionDefinitions()
     <EOF>
   } catch (ParseException e) {
@@ -243,6 +246,20 @@ SimpleNode Program(String programName) #void :
     symTabStack.pop();
     return rootNode;
   }
+}
+
+void TypeDeclaration() # void :
+{
+  TypeSpec type;
+  SymTabEntry typeID;
+}{
+	<IDENTIFIER > {
+	  typeID = javaCodeProcessTypeDefn(token);
+	  type = typeID.getTypeSpec();
+	  type.setAttribute(TypeKeyImpl.RECORD_SYMTAB, symTabStack.push());	}
+	"{" (VariableDeclaration())* "}"
+	{
+	  symTabStack.pop();	}
 }
 
 SimpleNode FunctionDefinitions() #void :
@@ -315,8 +332,8 @@ SimpleNode Block() :
 { SimpleNode rootNode; }
 {
   "{"
-      [<DECLARATION > ":" (VariableDeclaration())*
-      <STATEMENT> ":"]
+      [<VAR> ":" (VariableDeclaration())*
+      <BODY> ":"]
       Statements()
   "}"
   { return jjtThis ;}
@@ -339,8 +356,21 @@ void VariableDeclaration()  #void :
 {
    try {
   	<IDENTIFIER> { type = javaCodeGetAndProcessTypeID(token); }
-  	<IDENTIFIER> { javaCodeProcessVariableDeclaration(token, type); }
-  	";"
+   (
+  	   <IDENTIFIER>
+       { javaCodeProcessVariableDeclaration(token, type); }
+       |
+       "["
+       <INT> { int arraySize =  Integer.parseInt(token.image); }
+       "]"
+       <IDENTIFIER> {
+         TypeSpec arrayType = new TypeSpecImpl(TypeFormImpl.ARRAY);
+		 arrayType.setAttribute(TypeKeyImpl.ARRAY_ELEMENT_COUNT, arraySize);
+		 arrayType.setAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE, type);
+		 javaCodeProcessVariableDeclaration(token, arrayType);
+       }
+    )
+  	";" 
     } catch (ParseException e) {
      //javaCodeSkipLine();
      if (e.getMessage() != null)
@@ -393,8 +423,7 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
   Statement() #LOOP  //{ jjtThis.addChild(node); }}
 */
 void FunctionCall() : {}
-{
-  try  {  	<IDENTIFIER> {
+{  	<IDENTIFIER> {
     	SymTabEntry funcID = symTabStack.lookup(token.image);
     	if (funcID == null) {
 			System.out.println("** Compilation Error: Function of name: \"" + token.image
@@ -407,9 +436,7 @@ void FunctionCall() : {}
     	jjtThis.setTypeSpec(type);
     	jjtThis.setAttribute(ID, funcID);
   	}
-   	"(" [Expression() ("," Expression())*] ")"
-  } catch (ParseException e) {
-    javaCodeSkipLine();  }}
+   	"(" [Expression() ("," Expression())*] ")"}
 
 void ReturnStatement() : {}
 {
@@ -467,24 +494,27 @@ void Literal() : {}
         jjtThis.setTypeSpec(Predefined.realType);
         jjtThis.setAttribute(VALUE, Float.parseFloat(token.image)); 
   } |
-  <CHAR> {
-        jjtThis.setTypeSpec(Predefined.charType);
-        jjtThis.setAttribute(VALUE, token.image.charAt(1)); 
-  } |
   <BOOL> {
         jjtThis.setTypeSpec(Predefined.booleanType);
         jjtThis.setAttribute(VALUE, Boolean.valueOf(token.image)); 
   }
 }
 
-void Variable() : {}
+void Variable() :
+{
+  SymTabEntry variableId;
+  int varLine, varCol;
+  SimpleNode fieldNode;
+}
 {
   	<IDENTIFIER> {
-  		SymTabEntry variableId = symTabStack.lookup(token.image);
+  		variableId = symTabStack.lookup(token.image);
+  		varLine = token.beginLine;
+  		varCol = token.beginColumn;
     	if (variableId == null) {
 			System.out.println("** Compilation Error: Variable of name: \"" + token.image
-		                    + "\" has not been decleared at line " + token.beginLine
-		                    + " column " + token.beginColumn);
+		                    + "\" has not been decleared at line " + varLine
+		                    + " column " + varCol);
 		    throw new ParseException();
     	}
   		variableId.appendLineNumber(token.beginLine);
@@ -492,6 +522,49 @@ void Variable() : {}
     	jjtThis.setTypeSpec(type);
     	jjtThis.setAttribute(ID, variableId);
    }
+   ["."
+   fieldNode = Field()
+   {
+    if (type.getForm() != TypeFormImpl.RECORD)
+    {
+			System.out.println("** Compilation Error: Variable of name: \"" + variableId.getName()
+		                    + "\" is not a structured type at " + varLine
+		                    + " column " + varCol);
+		    throw new ParseException();
+    }
+	
+    SymTab fieldsTab = (SymTab)type.getAttribute(TypeKeyImpl.RECORD_SYMTAB);
+    SymTabEntry fieldID = fieldsTab.lookup(token.image);
+    if (fieldID == null)    {
+  			System.out.println("** Compilation Error: Field of name: \"" + token.image
+		                    + "\" has not been defined at " + token.beginLine
+		                    + " column " + token.beginColumn);
+		    throw new ParseException();        }
+    fieldNode.setAttribute(ID, fieldID);
+    jjtThis.jjtAddChild(fieldNode, jjtThis.jjtGetNumChildren());    }
+   ]
+}
+
+SimpleNode Field() : {}{
+  <IDENTIFIER>
+  { return jjtThis; }}
+
+JAVACODE
+SymTabEntry javaCodeProcessTypeDefn(Token t) #void
+{
+  	if (symTabStack.getLocalSymTab().lookup(t.image) != null) {
+  	  System.out.println("** Compilation Error: Type of name: \"" + t.image
+		                    + "\" has already been decleared at line " + t.beginLine
+		                    + " column " + t.beginColumn);
+	  throw new ParseException();
+  	}
+    SymTabEntry typeID = symTabStack.enterLocal(t.image);
+    typeID.setDefinition(DefinitionImpl.TYPE);
+    typeID.appendLineNumber(t.beginLine);
+    TypeSpec type = new TypeSpecImpl(TypeFormImpl.RECORD);
+    type.setIdentifier(typeID);
+    typeID.setTypeSpec(type);
+    return typeID;
 }
 
 JAVACODE
@@ -517,7 +590,7 @@ SymTabEntry javaCodeProcessFuncDefn(Token t, TypeSpec type) #void
 		                    + " column " + t.beginColumn);
 	  throw new ParseException();
   	}    SymTabEntry funcID = symTabStack.enterLocal(t.image);
-    funcID.setDefinition(DefinitionImpl.TYPE);
+    funcID.setDefinition(DefinitionImpl.FUNCTION);
     funcID.appendLineNumber(t.beginLine);
     funcID.setTypeSpec(type); // set return type
     return funcID;
@@ -550,6 +623,7 @@ JAVACODE
 String javaCodeSkipLine() #void
 {
   Token t = getNextToken();
-  while (t.kind != SEMICOLON) t = getNextToken();
+  
+  while (t.kind != SEMICOLON && t.kind != EOF) t = getNextToken();
   return t.image;
 }

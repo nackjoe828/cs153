@@ -34,23 +34,6 @@ public class TypeSpecImpl
         this.identifier = null;
     }
 
-    /**
-     * Constructor.
-     * @param value a string value.
-     */
-    public TypeSpecImpl(String value)
-    {
-        this.form = ARRAY;
-
-        TypeSpec indexType = new TypeSpecImpl(SUBRANGE);
-        indexType.setAttribute(SUBRANGE_BASE_TYPE, Predefined.integerType);
-        indexType.setAttribute(SUBRANGE_MIN_VALUE, 1);
-        indexType.setAttribute(SUBRANGE_MAX_VALUE, value.length());
-
-        setAttribute(ARRAY_INDEX_TYPE, indexType);
-        setAttribute(ARRAY_ELEMENT_TYPE, Predefined.charType);
-        setAttribute(ARRAY_ELEMENT_COUNT, value.length());
-    }
 
     /**
      * Getter
@@ -97,23 +80,6 @@ public class TypeSpecImpl
     public Object getAttribute(TypeKey key)
     {
         return this.get(key);
-    }
-
-    /**
-     * @return true if this is a Pascal string type.
-     */
-    public boolean isPascalString()
-    {
-        if (form == ARRAY) {
-            TypeSpec elmtType  = (TypeSpec) getAttribute(ARRAY_ELEMENT_TYPE);
-            TypeSpec indexType = (TypeSpec) getAttribute(ARRAY_INDEX_TYPE);
-
-            return (elmtType.baseType()  == Predefined.charType) &&
-                   (indexType.baseType() == Predefined.integerType);
-        }
-        else {
-            return false;
-        }
     }
 
     /**

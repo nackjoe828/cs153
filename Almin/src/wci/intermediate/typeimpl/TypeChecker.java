@@ -92,15 +92,7 @@ public class TypeChecker
         return isBoolean(type1) && isBoolean(type2);
     }
 
-    /**
-     * Check if a type specification is char.
-     * @param type the type specification to check.
-     * @return true if char, else false.
-     */
-    public static boolean isChar(TypeSpec type)
-    {
-        return (type != null) && (type.baseType() == Predefined.charType);
-    }
+
 
     /**
      * Check if two type specifications are assignment compatible.
@@ -193,14 +185,6 @@ public class TypeChecker
             TypeSpec elmtType2 =
                 (TypeSpec) type2.getAttribute(ARRAY_ELEMENT_TYPE);
 
-            if (isChar(elmtType1) && isChar(elmtType2)) {
-                int elmtCount1 =
-                    (Integer) type1.getAttribute(ARRAY_ELEMENT_COUNT);
-                int elmtCount2 =
-                    (Integer) type2.getAttribute(ARRAY_ELEMENT_COUNT);
-
-                equal = elmtCount1 == elmtCount2;
-            }
         }
 
         return equal;

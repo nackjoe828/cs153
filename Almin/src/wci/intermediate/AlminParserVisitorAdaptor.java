@@ -3,6 +3,7 @@ package wci.intermediate;
 import wci.frontend.ASTASSIGN;
 import wci.frontend.ASTBlock;
 import wci.frontend.ASTEQ;
+import wci.frontend.ASTField;
 import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTGE;
 import wci.frontend.ASTGT;
@@ -139,6 +140,11 @@ public class AlminParserVisitorAdaptor implements AlminParserVisitor
 
 	@Override
 	public Object visit(ASTStringLiteral node, Object data) {
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTField node, Object data) {
 		return node.childrenAccept(this, data);
 	}
 
