@@ -1,6 +1,7 @@
 package wci.intermediate;
 
 import wci.frontend.ASTEQ;
+import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTGE;
 import wci.frontend.ASTGT;
 import wci.frontend.ASTLE;
@@ -17,7 +18,9 @@ import wci.frontend.ASTmult;
 import wci.frontend.ASTor;
 import wci.frontend.ASTsub;
 import wci.frontend.SimpleNode;
+import wci.intermediate.icodeimpl.ICodeKeyImpl;
 import wci.intermediate.symtabimpl.Predefined;
+import wci.intermediate.symtabimpl.SymTabKeyImpl;
 
 
 public class TypeSetterVisitor extends AlminParserVisitorAdaptor
@@ -141,4 +144,6 @@ public class TypeSetterVisitor extends AlminParserVisitorAdaptor
 	public Object visit(ASTStringLiteral node, Object data) {
 		return data;
 	}
+
+	
 }

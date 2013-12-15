@@ -69,9 +69,17 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     crossReferencer.print(symTabStack);
         if (rootNode != null)
         {
-    // Visit the parse tree nodes to decorate them with type information.
-    TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
-    rootNode.jjtAccept(typeVisitor, null);
+
+        // Visit the parse tree nodes to decorate them with type information.
+        TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
+        rootNode.jjtAccept(typeVisitor, null);
+        ArrayList<SymTabEntry> funcIDs
+                = (ArrayList<SymTabEntry>)programId.getAttribute(ROUTINE_ROUTINES);
+        for (SymTabEntry e : funcIDs)
+        {
+          ICode iCode = (ICode)e.getAttribute(ROUTINE_ICODE);
+          (iCode.getRoot()).jjtAccept(typeVisitor, null);
+        }
 
         // Create and initialize the ICode wrapper for the parse tree.
         ICode iCode = ICodeFactory.createICode();
@@ -1211,6 +1219,17 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
     finally { jj_save(2, xla); }
   }
 
+  static private boolean jj_3R_10() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_9() {
+    if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LPAREN)) return true;
+    return false;
+  }
+
   static private boolean jj_3_1() {
     if (jj_3R_8()) return true;
     return false;
@@ -1229,17 +1248,6 @@ void ForLoop() # void : {ICodeNode node; int count = 2;}{
   static private boolean jj_3R_8() {
     if (jj_3R_10()) return true;
     if (jj_scan_token(ASSIGN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_10() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_9() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 

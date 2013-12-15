@@ -88,9 +88,15 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants/*@e
     crossReferencer.print(symTabStack);
 	if (rootNode != null)
 	{
-    // Visit the parse tree nodes to decorate them with type information.
-    TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
-    rootNode.jjtAccept(typeVisitor, null);
+	  	
+    	// Visit the parse tree nodes to decorate them with type information.
+    	TypeSetterVisitor typeVisitor = new TypeSetterVisitor();
+    	rootNode.jjtAccept(typeVisitor, null);
+    	ArrayList<SymTabEntry> funcIDs
+    		= (ArrayList<SymTabEntry>)programId.getAttribute(ROUTINE_ROUTINES);
+    	for (SymTabEntry e : funcIDs)    	{
+    	  ICode iCode = (ICode)e.getAttribute(ROUTINE_ICODE);
+    	  (iCode.getRoot()).jjtAccept(typeVisitor, null);    	}
 
     	// Create and initialize the ICode wrapper for the parse tree.
     	ICode iCode = ICodeFactory.createICode();
