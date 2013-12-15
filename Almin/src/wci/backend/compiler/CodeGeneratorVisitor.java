@@ -11,7 +11,7 @@ public class CodeGeneratorVisitor
 {
 	private int labelCount = 1;
 	
-    public Object visit(ASTAssignmentStatement node, Object data)
+    public Object visit(ASTASSIGN node, Object data)
     {
     	String programName        = (String) data;
         SimpleNode variableNode   = (SimpleNode) node.jjtGetChild(0);
@@ -339,7 +339,7 @@ public class CodeGeneratorVisitor
     	
     	SimpleNode blockNode = (SimpleNode) node.jjtGetChild(1);
     	blockNode.jjtAccept(this, data);
-    	CodeGenerator.objectFile.println("    goto L" + String.format("%03d", indexToCondition) + ":");
+    	CodeGenerator.objectFile.println("    goto L" + String.format("%03d", indexToCondition));
     	CodeGenerator.objectFile.println("L" + String.format("%03d", storedNumber) + ":");
     	CodeGenerator.objectFile.flush();
     	return data;

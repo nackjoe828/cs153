@@ -50,8 +50,6 @@ public class CodeGenerator extends Backend
         }
         programName = programName.substring(0, 1).toUpperCase() +
                       programName.substring(1);
-        String methodName = programName.substring(0, 1).toLowerCase() +
-                            programName.substring(1);
         
         SymTabEntry programId = symTabStack.getProgramId();
         //int localsCount = (Integer) programId.getAttribute(ROUTINE_LOCALS_COUNT);
@@ -68,7 +66,7 @@ public class CodeGenerator extends Backend
         objectFile.println(".field private static _runTimer LRunTimer;");
         objectFile.println(".field private static _standardIn LPascalTextIn;");
         objectFile.println();*/
-        
+        /*
         // Generate code for fields.
         for (SymTabEntry id : locals) {
             Definition defn = id.getDefinition();
@@ -80,7 +78,7 @@ public class CodeGenerator extends Backend
                 objectFile.println(".field private static " + fieldName + 
                 		           " " + typeCode);
             }
-        }
+        }*/
         objectFile.println();
         
         // Generate the class constructor.
@@ -94,6 +92,61 @@ public class CodeGenerator extends Backend
         objectFile.println(".limit stack 1");
         objectFile.println(".end method");
         objectFile.println();
+        
+        // generate code for method declaration
+        String methodName, strBuf;
+        ArrayList<SymTabEntry> funcList = (ArrayList<SymTabEntry>)programId.getAttribute(ROUTINE_ROUTINES);
+        ArrayList<SymTabEntry> paramList;
+        for (SymTabEntry currentEntry : funcList){
+        	strBuf = ".method public static " + currentEntry.getName() + "(";
+        	paramList = (ArrayList<SymTabEntry>)currentEntry.getAttribute(ROUTINE_PARMS);
+        	for(SymTabEntry param : paramList){
+        		TypeSpec type = param.getTypeSpec();
+        		String typeCode="";
+        		if(type == Predefined.integerType){
+        			typeCode = "I";
+        		}
+        		else if(type == Predefined.realType){
+        			typeCode = "F";
+        		}
+        		else if(type == Predefined.charType){
+        			typeCode = "C";
+        		}
+        		else if(type == Predefined.stringType){
+        			typeCode = "Ljava/lang/String;";
+        		}
+        		else if(type == Predefined.booleanType){
+        			typeCode = "Z";
+        		}
+        		strBuf += typeCode;
+        	}
+        	
+        	strBuf += ")";
+        	TypeSpec retType = currentEntry.getTypeSpec();
+    		String typeCode="";
+    		if(retType == Predefined.integerType){
+    			typeCode = "I";
+    		}
+    		else if(retType == Predefined.realType){
+    			typeCode = "F";
+    		}
+    		else if(retType == Predefined.charType){
+    			typeCode = "C";
+    		}
+    		else if(retType == Predefined.stringType){
+    			typeCode = "Ljava/lang/String;";
+    		}
+    		else if(retType == Predefined.booleanType){
+    			typeCode = "Z";
+    		}
+    		strBuf += typeCode;
+    		objectFile.println(strBuf);
+    		CodeGeneratorVisitor codeVisitor = new CodeGeneratorVisitor();
+    		ICode funcTree = (ICode)currentEntry.getAttribute(ROUTINE_ICODE);
+    		Node rootFunc = funcTree.getRoot();
+    		rootFunc.jjtAccept(codeVisitor, "");
+    		objectFile.println(".end method\n");
+        }
         
         // Generate the main method header.
         objectFile.println(".method public static main([Ljava/lang/String;)V");

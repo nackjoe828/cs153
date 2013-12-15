@@ -12,12 +12,43 @@
 .limit stack 1
 .end method
 
+.method public static proc1()
+.end method
+
+.method public static pow(FI)F
+    ldc 0
+    putstatic /i I
+    ldc 1.0
+    putstatic /ret F
+L002:
+    getstatic /i I
+    getstatic /exp I
+    if_icmpgt L003
+    iconst_0
+    goto L004
+L003:
+    iconst_1
+L004:
+    ifne L005
+    getstatic /ret F
+    getstatic /b F
+    fmul
+    putstatic /ret F
+    getstatic /i I
+    ldc 1
+    fadd
+    putstatic /i I
+    goto L002
+L005:
+    getstatic /ret F
+.end method
+
 .method public static main([Ljava/lang/String;)V
 
-    getstatic Functioncall/b F
     ldc 0.0
-    getstatic Functioncall/exp I
+    putstatic Functioncall/b F
     ldc 0
+    putstatic Functioncall/exp I
 L002:
     getstatic Functioncall/exp I
     ldc 10
@@ -28,15 +59,15 @@ L003:
     iconst_1
 L004:
     ifne L005
-    getstatic Functioncall/ans F
     getstatic Functioncall/b F
     getstatic Functioncall/exp I
     invokestatic Functioncall/pow(FI)F
-    getstatic Functioncall/exp I
+    putstatic Functioncall/ans F
     getstatic Functioncall/exp I
     ldc 1
     iadd
-    goto L002:
+    putstatic Functioncall/exp I
+    goto L002
 L005:
     getstatic Functioncall/exp I
     ldc 0
@@ -47,8 +78,8 @@ L006:
     iconst_1
 L007:
     ifeq L008
-    getstatic Functioncall/exp I
     ldc 4
+    putstatic Functioncall/exp I
 L008:
 
 
