@@ -37,7 +37,11 @@ public class TypeSetterVisitor extends AlminParserVisitorAdaptor
             if (childType == Predefined.stringType) {
             	type = Predefined.stringType;
             	break;
-            } else if (childType == Predefined.realType) {
+            } else if (childType == Predefined.booleanType) {
+                type = Predefined.booleanType;
+                break;
+            }
+            else if (childType == Predefined.realType) {
                 type = Predefined.realType;
                 break;
             }
