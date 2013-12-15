@@ -165,26 +165,6 @@ public class CodeGenerator extends Backend
     		Node rootFunc = funcTree.getRoot();
     		rootFunc.jjtAccept(codeVisitor, programName);
     		
-    		if(retType == Predefined.integerType){
-    			typeCode = "i";
-    		}
-    		else if(retType == Predefined.realType){
-    			typeCode = "f";
-    		}
-    		else if(retType == Predefined.charType){
-    			typeCode = "i";
-    		}
-    		else if(retType == Predefined.stringType){
-    			typeCode = "a";
-    		}
-    		else if(retType == Predefined.booleanType){
-    			typeCode = "i";
-    		}
-    		//void
-    		else
-    			typeCode = "";
-    		objectFile.println("    " + typeCode + "return\n\n");
-    		
     		SymTab funcTable = (SymTab) currentEntry.getAttribute(ROUTINE_SYMTAB);
     		int localCount = funcTable.sortedEntries().size();
     		

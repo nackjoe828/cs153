@@ -30,9 +30,7 @@
     invokevirtual java/io/PrintStream/printf(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;
    pop
 
-    ldc 0
-    ldc 5
-    imul
+    ldc 350
     istore 1 ;Local/exp
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc "%d\n"
@@ -69,16 +67,26 @@
    pop
 
     iload 1  ;Local/exp
-    ldc 0
+    ldc 300
     if_icmpge L002
-    iconst_0
     goto L003
 L002:
-    iconst_1
-L003:
-    ifeq L004
     ldc 100.0
     fstore 0 ;Local/b
+    goto L004
+L003:
+    iload 1  ;Local/exp
+    ldc 200
+    if_icmpge L005
+    goto L006
+L005:
+    ldc 200.0
+    fstore 0 ;Local/b
+    goto L007
+L006:
+    ldc 300.0
+    fstore 0 ;Local/b
+L007:
 L004:
     getstatic java/lang/System/out Ljava/io/PrintStream;
     ldc "%f\n"
