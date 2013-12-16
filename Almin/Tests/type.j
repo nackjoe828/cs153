@@ -121,6 +121,9 @@
     invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;
     invokevirtual  java/util/HashMap.put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
     pop
+    aload 1  ;Local/v2
+    ldc "z"
+    fstore 2 ;Local/x
 
     getstatic	Type/_runTimer LRunTimer;
     invokevirtual	RunTimer.printElapsedTime()V

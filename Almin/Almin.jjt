@@ -389,8 +389,8 @@ void Statements() # void : {}
 void Statement() #void : {}
 {
   try  {
- 	 LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  	 Assignment() ";" | LOOKAHEAD(2) FunctionCall() ";" | Expression() ";"
+ 	 LOOKAHEAD(Variable() "=") // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
+  	 Assignment() ";" | LOOKAHEAD(2) FunctionCall() ";" | Expression() ";"  
   	 | ScopedBlock() | ControlStatement() |  ReturnStatement() | ";"
   } catch (ParseException e) {
      javaCodeSkipLine();
@@ -448,7 +448,7 @@ void ReturnStatement() : {}
 
 void Expression() #void : {}
 {
-  LOOKAHEAD(2) Assignment() | BooleanExpression()
+  LOOKAHEAD(Variable() "=") Assignment() | BooleanExpression()
 }
 
 void BooleanExpression() #void : {}
