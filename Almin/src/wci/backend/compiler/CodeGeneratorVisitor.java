@@ -372,9 +372,6 @@ public class CodeGeneratorVisitor
     		else if(currentChildType == Predefined.realType){
     			typeCodes[i] = "F";
     		}
-    		else if(currentChildType == Predefined.charType){
-    			typeCodes[i] = "C";
-    		}
     		else if(currentChildType == Predefined.stringType){
     			typeCodes[i] = "Ljava/lang/String;";
     		}
@@ -396,9 +393,6 @@ public class CodeGeneratorVisitor
 		}
 		else if(type == Predefined.realType){
 			typeCode = "F";
-		}
-		else if(type == Predefined.charType){
-			typeCode = "C";
 		}
 		else if(type == Predefined.stringType){
 			typeCode = "Ljava/lang/String;";
@@ -557,9 +551,6 @@ public class CodeGeneratorVisitor
 		}
 		else if(retType == Predefined.realType){
 			typeCode = "f";
-		}
-		else if(retType == Predefined.charType){
-			typeCode = "i";
 		}
 		else if(retType == Predefined.stringType){
 			typeCode = "a";
