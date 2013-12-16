@@ -65,7 +65,7 @@ L006:
     aload 2 ;array/reverse
     ldc 9
     iload 0  ;Local/count
-    fsub
+    isub
     aload 1  ;Local/original
     iload 0  ;Local/count
     iaload 

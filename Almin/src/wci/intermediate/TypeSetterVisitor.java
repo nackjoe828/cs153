@@ -4,6 +4,7 @@ import wci.frontend.ASTEQ;
 import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTGE;
 import wci.frontend.ASTGT;
+import wci.frontend.ASTIndex;
 import wci.frontend.ASTLE;
 import wci.frontend.ASTLT;
 import wci.frontend.ASTLiteral;
@@ -145,13 +146,13 @@ public class TypeSetterVisitor extends AlminParserVisitorAdaptor
 
 	@Override
 	public Object visit(ASTVariable node, Object data) {
-		return data;
+        Object obj = super.visit(node, data);
+        return obj;
 	}
 	
 	@Override
 	public Object visit(ASTStringLiteral node, Object data) {
 		return data;
 	}
-	
 	
 }
