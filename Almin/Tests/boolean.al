@@ -14,6 +14,7 @@ VAR:
 	bool[3] bools;
 BODY:
 	i = 1;
+	
 	if(foo(i)){
 		printf("Yes!");
 	}
