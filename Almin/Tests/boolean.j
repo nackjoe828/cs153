@@ -47,9 +47,14 @@ L004:
     invokenonvirtual	PascalTextIn/<init>()V
     putstatic	Boolean/_standardIn LPascalTextIn;
 
+
+;generating array/bools
+    ldc 3
+    astore 0 ;array/bools
+
     ldc 1
-    istore 0 ;Local/i
-    iload 0  ;Local/i
+    istore 1 ;Local/i
+    iload 1  ;Local/i
     invokestatic Boolean/foo(I)Z
     goto L002
 L001:

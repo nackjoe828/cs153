@@ -241,7 +241,7 @@ public class CodeGenerator extends Backend
 		//for each field
 		for(SymTabEntry e : recFieldEntries){
 			CodeGenerator.objectFile.println("    dup");
-			CodeGenerator.objectFile.println("    " + e.getName());
+			CodeGenerator.objectFile.println("    ldc \"" + e.getName() + "\"");
 			TypeSpec fieldType = e.getTypeSpec();
 			if(fieldType == Predefined.integerType){
 				CodeGenerator.objectFile.println("    ldc 0");
