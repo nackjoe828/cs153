@@ -464,7 +464,7 @@ public class CodeGeneratorVisitor
         		else if(type == Predefined.realType){
         			CodeGenerator.objectFile.println("    invokestatic java/lang/Float/valueOf(F)Ljava/lang/Float;");
         		}
-        		else if(type.getForm() == TypeFormImpl.RECORD){
+        		else if(type.getForm() == TypeFormImpl.RECORD || type.getForm() == TypeFormImpl.ARRAY){
         			SimpleNode varUnderField = (SimpleNode) objNode.jjtGetChild(0).jjtGetChild(0);
         			TypeSpec fieldType = varUnderField.getTypeSpec();
         			if(fieldType == Predefined.integerType){
