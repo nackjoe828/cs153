@@ -619,6 +619,11 @@ public class CodeGeneratorVisitor
     	leftHand.jjtAccept(this, data);
     	rightHand.jjtAccept(this, data);
     	TypeSpec type = leftHand.getTypeSpec();
+    	if(type == Predefined.realType){
+    		CodeGenerator.objectFile.println("    fcmpl");
+    		CodeGenerator.objectFile.println("    ifgt L" + String.format("%03d", ++labelCount));
+    		return data;
+    	}
     	String typePrefix = (type == Predefined.integerType) ? "i" : "f";
     	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmpgt L" + String.format("%03d", ++labelCount));
     	return data;
@@ -631,6 +636,11 @@ public class CodeGeneratorVisitor
     	leftHand.jjtAccept(this, data);
     	rightHand.jjtAccept(this, data);
     	TypeSpec type = leftHand.getTypeSpec();
+    	if(type == Predefined.realType){
+    		CodeGenerator.objectFile.println("    fcmpl");
+    		CodeGenerator.objectFile.println("    ifge L" + String.format("%03d", ++labelCount));
+    		return data;
+    	}
     	String typePrefix = (type == Predefined.integerType) ? "i" : "f";
     	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmpge L" + String.format("%03d", ++labelCount));
     	return data;
@@ -643,6 +653,11 @@ public class CodeGeneratorVisitor
     	leftHand.jjtAccept(this, data);
     	rightHand.jjtAccept(this, data);
     	TypeSpec type = leftHand.getTypeSpec();
+    	if(type == Predefined.realType){
+    		CodeGenerator.objectFile.println("    fcmpl");
+    		CodeGenerator.objectFile.println("    iflt L" + String.format("%03d", ++labelCount));
+    		return data;
+    	}
     	String typePrefix = (type == Predefined.integerType) ? "i" : "f";
     	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmplt L" + String.format("%03d", ++labelCount));
     	return data;
@@ -655,6 +670,11 @@ public class CodeGeneratorVisitor
     	leftHand.jjtAccept(this, data);
     	rightHand.jjtAccept(this, data);
     	TypeSpec type = leftHand.getTypeSpec();
+    	if(type == Predefined.realType){
+    		CodeGenerator.objectFile.println("    fcmpl");
+    		CodeGenerator.objectFile.println("    ifle L" + String.format("%03d", ++labelCount));
+    		return data;
+    	}
     	String typePrefix = (type == Predefined.integerType) ? "i" : "f";
     	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmple L" + String.format("%03d", ++labelCount));
     	return data;
@@ -667,6 +687,11 @@ public class CodeGeneratorVisitor
     	leftHand.jjtAccept(this, data);
     	rightHand.jjtAccept(this, data);
     	TypeSpec type = leftHand.getTypeSpec();
+    	if(type == Predefined.realType){
+    		CodeGenerator.objectFile.println("    fcmpl");
+    		CodeGenerator.objectFile.println("    ifeq L" + String.format("%03d", ++labelCount));
+    		return data;
+    	}
     	String typePrefix = (type == Predefined.integerType) ? "i" : "f";
     	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmpeq L" + String.format("%03d", ++labelCount));
     	return data;
@@ -679,6 +704,11 @@ public class CodeGeneratorVisitor
     	leftHand.jjtAccept(this, data);
     	rightHand.jjtAccept(this, data);
     	TypeSpec type = leftHand.getTypeSpec();
+    	if(type == Predefined.realType){
+    		CodeGenerator.objectFile.println("    fcmpl");
+    		CodeGenerator.objectFile.println("    ifne L" + String.format("%03d", ++labelCount));
+    		return data;
+    	}
     	String typePrefix = (type == Predefined.integerType) ? "i" : "f";
     	CodeGenerator.objectFile.println("    if_" + typePrefix + "cmpne L" + String.format("%03d", ++labelCount));
     	return data;
