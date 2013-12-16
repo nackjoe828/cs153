@@ -8,6 +8,7 @@ import wci.frontend.ASTFunctionCall;
 import wci.frontend.ASTGE;
 import wci.frontend.ASTGT;
 import wci.frontend.ASTIfStatement;
+import wci.frontend.ASTIndex;
 import wci.frontend.ASTLE;
 import wci.frontend.ASTLOOP;
 import wci.frontend.ASTLT;
@@ -145,6 +146,11 @@ public class AlminParserVisitorAdaptor implements AlminParserVisitor
 
 	@Override
 	public Object visit(ASTField node, Object data) {
+		return node.childrenAccept(this, data);
+	}
+
+	@Override
+	public Object visit(ASTIndex node, Object data) {
 		return node.childrenAccept(this, data);
 	}
 

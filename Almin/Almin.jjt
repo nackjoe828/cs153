@@ -505,7 +505,7 @@ void Variable() :
 {
   SymTabEntry variableId;
   int varLine, varCol;
-  SimpleNode fieldNode;
+  SimpleNode childNode;
 }
 {
   	<IDENTIFIER> {
@@ -523,8 +523,22 @@ void Variable() :
     	jjtThis.setTypeSpec(type);
     	jjtThis.setAttribute(ID, variableId);
    }
-   ["."
-   fieldNode = Field()
+   ["[" // ----- Array ----------------------------------------------------
+	childNode = Index()
+   {
+   	if (type.getForm() != TypeFormImpl.ARRAY)
+    {
+			System.out.println("** Compilation Error: Variable of name: \"" + variableId.getName()
+		                    + "\" is not an array type at " + varLine
+		                    + " column " + varCol);
+		    throw new ParseException();
+    }
+    jjtThis.jjtAddChild(childNode, jjtThis.jjtGetNumChildren()); 
+    type = (TypeSpec)type.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
+   } 
+   "]"
+   ]
+   ["." // ----- Structure -----------------------------------------------------------
    {
     if (type.getForm() != TypeFormImpl.RECORD)
     {
@@ -533,21 +547,29 @@ void Variable() :
 		                    + " column " + varCol);
 		    throw new ParseException();
     }
-	
+  
     SymTab fieldsTab = (SymTab)type.getAttribute(TypeKeyImpl.RECORD_SYMTAB);
-    SymTabEntry fieldID = fieldsTab.lookup(token.image);
+    /*SymTabEntry fieldID = fieldsTab.lookup(token.image);
     if (fieldID == null)    {
   			System.out.println("** Compilation Error: Field of name: \"" + token.image
 		                    + "\" has not been defined at " + token.beginLine
 		                    + " column " + token.beginColumn);
-		    throw new ParseException();        }
-    fieldNode.setAttribute(ID, fieldID);
-    jjtThis.jjtAddChild(fieldNode, jjtThis.jjtGetNumChildren());    }
+		    throw new ParseException();        }*/
+    symTabStack.push(fieldsTab);
+    }
+    childNode = Field()    {
+    //SymTabEntry fieldID = symTabStack.lookup(token.image);    symTabStack.pop();
+    //fieldNode.setAttribute(ID, fieldID);
+    jjtThis.jjtAddChild(childNode, jjtThis.jjtGetNumChildren());    }
    ]
 }
 
+SimpleNode Index() : {}{
+  Expression()
+  { return jjtThis; }}
+
 SimpleNode Field() : {}{
-  <IDENTIFIER>
+  Variable()
   { return jjtThis; }}
 
 JAVACODE

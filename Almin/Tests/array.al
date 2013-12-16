@@ -1,6 +1,6 @@
 main {
 VAR:
-	int[5] intArray;
+	string[5] intArray;
 BODY:
-	intArray = 3 + 3;
+	intArray[3+1] = "3" + 3;
 }

@@ -1,4 +1,4 @@
-.class public Array
+.class public Stringadd
 .super java/lang/Object
 
 .field private static _runTimer LRunTimer;
@@ -20,11 +20,11 @@
     new	 RunTimer
     dup
     invokenonvirtual	RunTimer/<init>()V
-    putstatic	Array/_runTimer LRunTimer;
+    putstatic	Stringadd/_runTimer LRunTimer;
     new	 PascalTextIn
     dup
     invokenonvirtual	PascalTextIn/<init>()V
-    putstatic	Array/_standardIn LPascalTextIn;
+    putstatic	Stringadd/_standardIn LPascalTextIn;
 
     new java/lang/StringBuilder
     dup
@@ -32,12 +32,11 @@
     invokenonvirtual java/lang/StringBuilder/<init>(Ljava/lang/String;)V
     ldc "3"
     invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    ldc 3
+    ldc 2
     invokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;
     invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;
-    istore 0 ;Local/intArray
 
-    getstatic	Array/_runTimer LRunTimer;
+    getstatic	Stringadd/_runTimer LRunTimer;
     invokevirtual	RunTimer.printElapsedTime()V
 
     return

@@ -1042,7 +1042,7 @@ void Variable() :
 /*@egen*/
   SymTabEntry variableId;
   int varLine, varCol;
-  SimpleNode fieldNode;
+  SimpleNode childNode;
 }
 {/*@bgen(jjtree) Variable */
         try {
@@ -1062,8 +1062,22 @@ void Variable() :
     	jjtn000.setTypeSpec(type);
     	jjtn000.setAttribute(ID, variableId);
    }
-   ["."
-   fieldNode = Field()
+   ["[" // ----- Array ----------------------------------------------------
+	childNode = Index()
+   {
+   	if (type.getForm() != TypeFormImpl.ARRAY)
+    {
+			System.out.println("** Compilation Error: Variable of name: \"" + variableId.getName()
+		                    + "\" is not an array type at " + varLine
+		                    + " column " + varCol);
+		    throw new ParseException();
+    }
+    jjtn000.jjtAddChild(childNode, jjtn000.jjtGetNumChildren()); 
+    type = (TypeSpec)type.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
+   } 
+   "]"
+   ]
+   ["." // ----- Structure -----------------------------------------------------------
    {
     if (type.getForm() != TypeFormImpl.RECORD)
     {
@@ -1072,16 +1086,20 @@ void Variable() :
 		                    + " column " + varCol);
 		    throw new ParseException();
     }
-	
+  
     SymTab fieldsTab = (SymTab)type.getAttribute(TypeKeyImpl.RECORD_SYMTAB);
-    SymTabEntry fieldID = fieldsTab.lookup(token.image);
+    /*SymTabEntry fieldID = fieldsTab.lookup(token.image);
     if (fieldID == null)    {
   			System.out.println("** Compilation Error: Field of name: \"" + token.image
 		                    + "\" has not been defined at " + token.beginLine
 		                    + " column " + token.beginColumn);
-		    throw new ParseException();        }
-    fieldNode.setAttribute(ID, fieldID);
-    jjtn000.jjtAddChild(fieldNode, jjtn000.jjtGetNumChildren());    }
+		    throw new ParseException();        }*/
+    symTabStack.push(fieldsTab);
+    }
+    childNode = Field()    {
+    //SymTabEntry fieldID = symTabStack.lookup(token.image);    symTabStack.pop();
+    //fieldNode.setAttribute(ID, fieldID);
+    jjtn000.jjtAddChild(childNode, jjtn000.jjtGetNumChildren());    }
    ]/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -1105,6 +1123,41 @@ void Variable() :
 /*@egen*/
 }
 
+SimpleNode Index() : {/*@bgen(jjtree) Index */
+  ASTIndex jjtn000 = new ASTIndex(JJTINDEX);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}{/*@bgen(jjtree) Index */
+  try {
+/*@egen*/
+  Expression()/*@bgen(jjtree)*/
+  {
+    jjtree.closeNodeScope(jjtn000, true);
+    jjtc000 = false;
+  }
+/*@egen*/
+  { return jjtn000; }/*@bgen(jjtree)*/
+  } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      throw (RuntimeException)jjte000;
+    }
+    if (jjte000 instanceof ParseException) {
+      throw (ParseException)jjte000;
+    }
+    throw (Error)jjte000;
+  } finally {
+    if (jjtc000) {
+      jjtree.closeNodeScope(jjtn000, true);
+    }
+  }
+/*@egen*/}
+
 SimpleNode Field() : {/*@bgen(jjtree) Field */
   ASTField jjtn000 = new ASTField(JJTFIELD);
   boolean jjtc000 = true;
@@ -1112,13 +1165,27 @@ SimpleNode Field() : {/*@bgen(jjtree) Field */
 /*@egen*/}{/*@bgen(jjtree) Field */
   try {
 /*@egen*/
-  <IDENTIFIER>/*@bgen(jjtree)*/
+  Variable()/*@bgen(jjtree)*/
   {
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
   }
 /*@egen*/
   { return jjtn000; }/*@bgen(jjtree)*/
+  } catch (Throwable jjte000) {
+    if (jjtc000) {
+      jjtree.clearNodeScope(jjtn000);
+      jjtc000 = false;
+    } else {
+      jjtree.popNode();
+    }
+    if (jjte000 instanceof RuntimeException) {
+      throw (RuntimeException)jjte000;
+    }
+    if (jjte000 instanceof ParseException) {
+      throw (ParseException)jjte000;
+    }
+    throw (Error)jjte000;
   } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
