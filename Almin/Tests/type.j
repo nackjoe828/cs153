@@ -16,46 +16,6 @@
 .end method
 
 .method public static foo(Ljava/util/HashMap;)Ljava/util/HashMap;
-    getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "Hello%d,%f\n"
-    ldc 2
-    anewarray java/lang/Object
-
-    dup
-    ldc 0
-    aload 0  ;Local/x
-    ldc "x"
-    invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)Ljava/lang/Object;
-    checkcast      java/lang/Integer
-    invokevirtual  java/lang/Integer.intValue()I
-    invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;
-    aastore
-
-    dup
-    ldc 1
-    aload 0  ;Local/x
-    ldc "y"
-    invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)Ljava/lang/Object;
-    checkcast      java/lang/Float
-    invokevirtual  java/lang/Float.floatValue()F
-    invokestatic java/lang/Float/valueOf(F)Ljava/lang/Float;
-    aastore
-
-    invokevirtual java/io/PrintStream/printf(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;
-   pop
-
-    aload 0 ;record/x
-    ldc "x"
-    ldc 8
-    invokestatic   java/lang/Integer.valueOf(I)Ljava/lang/Integer;
-    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-    pop
-    aload 0 ;record/x
-    ldc "y"
-    ldc 9.0
-    invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;
-    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-    pop
     aload 0  ;Local/x
     areturn
 
@@ -92,40 +52,30 @@
     invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;
     invokevirtual  java/util/HashMap.put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
     pop
+    dup
+    ldc "z"
+    ldc ""
+    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+    pop
     astore 1 ;record/v1
 
     aload 1 ;record/v1
-    ldc "x"
-    ldc 2
-    invokestatic   java/lang/Integer.valueOf(I)Ljava/lang/Integer;
+    ldc "z"
+    ldc "hello%d"
     invokevirtual  java/util/HashMap.put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
     pop
-    aload 1  ;Local/v1
-    invokestatic Type/foo(Ljava/util/HashMap;)Ljava/util/HashMap;
-    astore 1 ;record/v1
     getstatic java/lang/System/out Ljava/io/PrintStream;
-    ldc "v1.x=%d,v1.y=%f\n"
-    ldc 2
+    aload 1  ;Local/v1
+    ldc "z"
+    invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)Ljava/lang/Object;
+    checkcast      java/lang/String
+    ldc 1
     anewarray java/lang/Object
 
     dup
     ldc 0
-    aload 1  ;Local/v1
-    ldc "x"
-    invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)Ljava/lang/Object;
-    checkcast      java/lang/Integer
-    invokevirtual  java/lang/Integer.intValue()I
+    ldc 3
     invokestatic java/lang/Integer/valueOf(I)Ljava/lang/Integer;
-    aastore
-
-    dup
-    ldc 1
-    aload 1  ;Local/v1
-    ldc "y"
-    invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)Ljava/lang/Object;
-    checkcast      java/lang/Float
-    invokevirtual  java/lang/Float.floatValue()F
-    invokestatic java/lang/Float/valueOf(F)Ljava/lang/Float;
     aastore
 
     invokevirtual java/io/PrintStream/printf(Ljava/lang/String;[Ljava/lang/Object;)Ljava/io/PrintStream;

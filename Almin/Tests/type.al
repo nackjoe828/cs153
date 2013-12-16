@@ -17,9 +17,9 @@ FUNC:
 		vector v1;
 		int a;
 	BODY:
-		v1.z = "hello";
+		v1.z = "hello%d";
 
-		printf(v1.z);
+		printf(v1.z,3);
 
 		/*
 		v1.x = 2;

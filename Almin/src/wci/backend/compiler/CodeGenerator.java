@@ -260,10 +260,9 @@ public class CodeGenerator extends Backend
 				CodeGenerator.objectFile.println("    invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;");
 			}
 			else if(fieldType == Predefined.stringType){
-				CodeGenerator.objectFile.println("    new java/lang/StringBuilder");
-				CodeGenerator.objectFile.println("    dup");
+				//CodeGenerator.objectFile.println("    new java/lang/StringBuilder");
 				CodeGenerator.objectFile.println("    ldc \"\"");
-				CodeGenerator.objectFile.println("    invokenonvirtual java/lang/StringBuilder/<init>(Ljava/lang/String;)V");
+				//CodeGenerator.objectFile.println("    invokenonvirtual java/lang/StringBuilder/<init>(Ljava/lang/String;)V");
 			}
 			//if record
 			/*

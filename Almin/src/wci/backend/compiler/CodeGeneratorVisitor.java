@@ -192,6 +192,9 @@ public class CodeGeneratorVisitor
             	CodeGenerator.objectFile.println("    checkcast      java/lang/Float");
             	CodeGenerator.objectFile.println("    invokevirtual  java/lang/Float.floatValue()F");
             }
+            else if(varType == Predefined.stringType){
+            	CodeGenerator.objectFile.println("    checkcast      java/lang/String");
+            }
             else typeCode = "not defined yet";
         	
         	
