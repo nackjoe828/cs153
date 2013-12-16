@@ -104,9 +104,6 @@ public class CodeGenerator extends Backend
         		else if(type == Predefined.realType){
         			typeCode = "F";
         		}
-        		else if(type == Predefined.charType){
-        			typeCode = "C";
-        		}
         		else if(type == Predefined.stringType){
         			typeCode = "Ljava/lang/String;";
         		}
@@ -135,9 +132,6 @@ public class CodeGenerator extends Backend
     		}
     		else if(retType == Predefined.realType){
     			typeCode = "F";
-    		}
-    		else if(retType == Predefined.charType){
-    			typeCode = "C";
     		}
     		else if(retType == Predefined.stringType){
     			typeCode = "Ljava/lang/String;";
