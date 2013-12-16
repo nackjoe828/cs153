@@ -26,16 +26,10 @@
     invokenonvirtual	PascalTextIn/<init>()V
     putstatic	Array/_standardIn LPascalTextIn;
 
-    new java/lang/StringBuilder
-    dup
-    ldc ""
-    invokenonvirtual java/lang/StringBuilder/<init>(Ljava/lang/String;)V
-    ldc "3"
-    invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    ldc 1
+    istore 0 ;Local/a
     ldc 3
-    invokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;
-    invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;
-    istore 0 ;Local/intArray
+    istore 0 ;Local/a
 
     getstatic	Array/_runTimer LRunTimer;
     invokevirtual	RunTimer.printElapsedTime()V

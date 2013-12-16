@@ -66,8 +66,8 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     }
 
     // Print the cross-reference table.
-    CrossReferencer crossReferencer = new CrossReferencer();
-    crossReferencer.print(symTabStack);
+  //  CrossReferencer crossReferencer = new CrossReferencer();
+  //  crossReferencer.print(symTabStack);
         if (rootNode != null)
         {
 
