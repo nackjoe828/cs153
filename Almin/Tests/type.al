@@ -6,23 +6,26 @@ TYPE:
 		real z; 
 	}
 
-VAR:
-	vector v;
-
 FUNC:
+
+	string retstr(){
+	return "Hello";
+	}
+
 	main {
 	VAR: 
 		vector v1;
 		vector v2;
-		vector v3;
+		real x;
 	BODY:
-		v1.x = 1;
-		v1.y = 2;
-		v1.z = 3;
+		v1.x = 1.0;
+		v1.y = 2.0;
+		v1.z = 3.0;
 		
-		v2.x = 3;
-		v2.y = 2;
-		v2.z = 1;
+		v2.x = 3.0;
+		v2.y = 2.0;
+		v2.z = 1.0;
+		x = v2.z;
 		
-		v = v1 + v2;
+		//v = v1 + v2;
 	}

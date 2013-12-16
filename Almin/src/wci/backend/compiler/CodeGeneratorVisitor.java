@@ -8,6 +8,7 @@ import wci.frontend.*;
 import wci.intermediate.*;
 import wci.backend.compiler.CodeGenerator;
 import wci.intermediate.symtabimpl.Predefined;
+import wci.intermediate.typeimpl.TypeFormImpl;
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
 
 public class CodeGeneratorVisitor
@@ -21,13 +22,41 @@ public class CodeGeneratorVisitor
     	String programName        = (String) data;
         SimpleNode variableNode   = (SimpleNode) node.jjtGetChild(0);
         SimpleNode expressionNode = (SimpleNode) node.jjtGetChild(1);
+        TypeSpec expressionType = expressionNode.getTypeSpec();
+        TypeSpec targetType = variableNode.getTypeSpec();
 
+        //if record type, program enters here
+        if(variableNode.getTypeSpec().getForm() == TypeFormImpl.RECORD){
+        	variableNode.jjtAccept(this, data);
+        	expressionNode.jjtAccept(this, data);
+        	
+        	/*Node varNode = node.jjtGetChild(0);
+        	SimpleNode childOfField = (SimpleNode) varNode.jjtGetChild(0);
+        	TypeSpec fieldChildType = childOfField.getTypeSpec();
+            // Convert an integer value to float if necessary.
+            if ((fieldChildType == Predefined.realType) &&
+                (expressionType == Predefined.integerType))
+            {
+                CodeGenerator.objectFile.println("    i2f");
+                CodeGenerator.objectFile.flush();
+            }*/
+            
+        	if(expressionType == Predefined.integerType){
+        		CodeGenerator.objectFile.println("    invokestatic   java/lang/Integer.valueOf(I)Ljava/lang/Integer;");
+        	}
+        	else if(expressionType == Predefined.realType){
+        		CodeGenerator.objectFile.println("    invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;");
+        	}
+        	
+        	CodeGenerator.objectFile.println("    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;"
+        			+ "Ljava/lang/Object;)Ljava/lang/Object;");
+        	CodeGenerator.objectFile.println("    pop");
+        	return data;
+        }
+        	
+        
         // Emit code for the expression.
         expressionNode.jjtAccept(this, data);
-        TypeSpec expressionType = expressionNode.getTypeSpec();
-
-        // Get the assignment target type.
-        TypeSpec targetType = variableNode.getTypeSpec();
 
         // Convert an integer value to float if necessary.
         if ((targetType == Predefined.realType) &&
@@ -50,6 +79,7 @@ public class CodeGeneratorVisitor
         if(type == Predefined.integerType) typeCode = "i";
         else if(type == Predefined.realType) typeCode = "f";
         else if(type == Predefined.stringType) typeCode = "a";
+        else if(type.getForm() == TypeFormImpl.RECORD) typeCode = "a";
         else typeCode = "i";
 
         // Emit the appropriate store instruction.
@@ -80,14 +110,30 @@ public class CodeGeneratorVisitor
         if(type == Predefined.integerType) typeCode = "i";
         else if(type == Predefined.realType) typeCode = "i";
         else if(type == Predefined.stringType) typeCode = "a";
-        else typeCode = "i";
+        else if(type.getForm() == TypeFormImpl.RECORD) typeCode = "a";
+        else typeCode = "a";
 
         // Emit the appropriate load instruction.
         //CodeGenerator.objectFile.println("    getstatic " + programName + "/" + fieldName + " " + typeCode);
         CodeGenerator.objectFile.println("    " + typeCode + "load " + slotNumber + "  ;" + "Local/" + id.getName());
         CodeGenerator.objectFile.flush();
+        
+        //if record, field follows
+        if(type.getForm() == TypeFormImpl.RECORD){
+        	node.jjtGetChild(0).jjtAccept(this, data);
+        }
 
         return data;
+    }
+    
+    public Object visit(ASTField node, Object data){
+    	SimpleNode child = (SimpleNode) node.jjtGetChild(0);
+    	SymTabEntry childEntry = (SymTabEntry)child.getAttribute(ID);
+    	TypeSpec type = node.getTypeSpec();
+    	String name = childEntry.getName();
+    	CodeGenerator.objectFile.println("    ldc \"" + name + "\"");
+    	
+    	return data;
     }
 
     public Object visit(ASTLiteral node, Object data)

@@ -9,6 +9,8 @@ import java.io.*;
 import wci.frontend.*;
 import wci.intermediate.*;
 import wci.intermediate.symtabimpl.Predefined;
+import wci.intermediate.typeimpl.TypeFormImpl;
+import wci.intermediate.typeimpl.TypeKeyImpl;
 import wci.backend.*;
 import static wci.intermediate.symtabimpl.SymTabKeyImpl.*;
 import static wci.intermediate.symtabimpl.DefinitionImpl.*;
@@ -182,7 +184,11 @@ public class CodeGenerator extends Backend
         SymTab mainTab = (SymTab) programTab.lookup("main").getAttribute(ROUTINE_SYMTAB);
     	ArrayList<SymTabEntry> tabEntries = mainTab.sortedEntries();
     	for(SymTabEntry currentTabEntry : tabEntries){
-			paramIndexAndEntry.add(currentTabEntry);
+			//if record, generate code for record declaration 
+			TypeSpec currentType = currentTabEntry.getTypeSpec();
+			if(currentType.getForm() == TypeFormImpl.RECORD) generateRecord(currentTabEntry);
+			//rec is added in generateRecord method
+			else paramIndexAndEntry.add(currentTabEntry);
     	}
 
         // Visit the parse tree nodes to generate code 
@@ -204,5 +210,52 @@ public class CodeGenerator extends Backend
         objectFile.flush();
 
         CodeGenerator.objectFile.close();
+    }
+    
+    private void generateRecord(SymTabEntry recEntry){
+		CodeGenerator.objectFile.println();
+		CodeGenerator.objectFile.println(";generating record/" + recEntry.getName());
+		CodeGenerator.objectFile.println("    new  java/util/HashMap");
+		CodeGenerator.objectFile.println("    dup");
+		CodeGenerator.objectFile.println("    invokenonvirtual  java/util/HashMap/<init>()V");
+		
+		//generate code for field declaration
+		TypeSpec currentType = recEntry.getTypeSpec();
+		SymTab recFieldTab = (SymTab) currentType.getAttribute(TypeKeyImpl.RECORD_SYMTAB);
+		ArrayList<SymTabEntry> recFieldEntries = recFieldTab.sortedEntries();
+		
+		//for each field
+		for(SymTabEntry e : recFieldEntries){
+			CodeGenerator.objectFile.println("    dup");
+			CodeGenerator.objectFile.println("    " + e.getName());
+			TypeSpec fieldType = e.getTypeSpec();
+			if(fieldType == Predefined.integerType){
+				CodeGenerator.objectFile.println("    ldc 0");
+				CodeGenerator.objectFile.println("    invokestatic   java/lang/Integer.valueOf(I)Ljava/lang/Integer;");
+			}
+			else if(fieldType == Predefined.realType){
+				CodeGenerator.objectFile.println("    ldc 0,0");
+				CodeGenerator.objectFile.println("    invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;");
+			}
+			else if(fieldType == Predefined.stringType){
+				CodeGenerator.objectFile.println("    new java/lang/StringBuilder");
+				CodeGenerator.objectFile.println("    dup");
+				CodeGenerator.objectFile.println("    ldc \"\"");
+				CodeGenerator.objectFile.println("    invokenonvirtual java/lang/StringBuilder/<init>(Ljava/lang/String;)V");
+			}
+			//if record
+			/*
+			else{
+				generateRecord(e);
+			}*/
+			
+			CodeGenerator.objectFile.println("    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;"
+						+ "Ljava/lang/Object;)Ljava/lang/Object;");
+			CodeGenerator.objectFile.println("    pop");
+		}
+		CodeGenerator.objectFile.println("    astore " + paramIndexAndEntry.size() 
+				+ " ;record/" + recEntry.getName());
+		CodeGenerator.objectFile.println();
+		paramIndexAndEntry.add(recEntry);
     }
 }

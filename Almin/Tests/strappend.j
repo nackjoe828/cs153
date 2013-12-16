@@ -34,13 +34,15 @@
     istore 0 ;Local/i
     new java/lang/StringBuilder
     dup
-    aload 1  ;Local/s1
+    ldc ""
     invokenonvirtual java/lang/StringBuilder/<init>(Ljava/lang/String;)V
     iload 0  ;Local/i
-    invokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;
-    invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;
     ldc 7
     iadd
+    invokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;
+    aload 1  ;Local/s1
+    invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+    invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;
     astore 1 ;Local/s1
     getstatic java/lang/System/out Ljava/io/PrintStream;
     aload 1  ;Local/s1
