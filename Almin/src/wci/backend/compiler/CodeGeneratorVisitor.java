@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import wci.frontend.*;
 import wci.intermediate.*;
+import wci.backend.compiler.CodeGenerator;
 import wci.intermediate.symtabimpl.Predefined;
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
 
