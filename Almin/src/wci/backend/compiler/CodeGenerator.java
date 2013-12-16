@@ -129,7 +129,9 @@ public class CodeGenerator extends Backend
         	ArrayList<SymTabEntry> tabEntries = currentFuncSymTab.sortedEntries();
         	for(SymTabEntry currentTabEntry : tabEntries){
         		if(!paramList.contains(currentTabEntry)){
-        			paramIndexAndEntry.add(currentTabEntry);
+        			if(!(currentTabEntry.getTypeSpec().getForm() == TypeFormImpl.RECORD)){
+        				paramIndexAndEntry.add(currentTabEntry);
+        			}
         		}
         	}
         	
@@ -160,6 +162,21 @@ public class CodeGenerator extends Backend
     		}
     		strBuf += typeCode;
     		objectFile.println(strBuf);
+    		
+    		
+    		
+    		//initialize record
+    		currentFuncSymTab = (SymTab) currentEntry.getAttribute(ROUTINE_SYMTAB); 
+        	tabEntries = currentFuncSymTab.sortedEntries();
+        	for(SymTabEntry currentTabEntry : tabEntries){
+        		if(!paramList.contains(currentTabEntry)){
+        			TypeSpec currentType = currentTabEntry.getTypeSpec();
+        			if(currentType.getForm() == TypeFormImpl.RECORD) generateRecord(currentTabEntry);
+        		}
+        	}
+    		
+    		
+    		
     		
     		//generate code inside method
     		CodeGeneratorVisitor codeVisitor = new CodeGeneratorVisitor();
@@ -210,7 +227,7 @@ public class CodeGenerator extends Backend
 			if(currentType.getForm() == TypeFormImpl.RECORD) generateRecord(currentTabEntry);
 			if(currentType.getForm() == TypeFormImpl.ARRAY) generateArray(currentTabEntry);
 			//rec is added in generateRecord method
-			else paramIndexAndEntry.add(currentTabEntry);
+			paramIndexAndEntry.add(currentTabEntry);
     	}
 
         // Visit the parse tree nodes to generate code 
@@ -226,7 +243,7 @@ public class CodeGenerator extends Backend
         objectFile.println();
         objectFile.println("    return");
         objectFile.println();
-        objectFile.println(".limit locals " + 4);
+        objectFile.println(".limit locals " + 16);
         objectFile.println(".limit stack  " + STACK_LIMIT);
         objectFile.println(".end method");
         objectFile.flush();
@@ -277,7 +294,6 @@ public class CodeGenerator extends Backend
 		CodeGenerator.objectFile.println("    astore " + paramIndexAndEntry.size() 
 				+ " ;record/" + recEntry.getName());
 		CodeGenerator.objectFile.println();
-		paramIndexAndEntry.add(recEntry);
     }
     
     private void generateArray(SymTabEntry arrEntry){
@@ -299,6 +315,5 @@ public class CodeGenerator extends Backend
 		CodeGenerator.objectFile.println("    astore " + paramIndexAndEntry.size() 
 				+ " ;array/" + arrEntry.getName());
 		CodeGenerator.objectFile.println();
-		paramIndexAndEntry.add(arrEntry);
     }
 }

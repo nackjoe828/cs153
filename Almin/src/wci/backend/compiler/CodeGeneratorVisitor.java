@@ -265,6 +265,7 @@ public class CodeGeneratorVisitor
 
         // Get the addition type.
         TypeSpec type = node.getTypeSpec();
+        	
         String typePrefix = (type == Predefined.integerType) ? "i" : "f";
         
         //if first add is string type, invoke append
