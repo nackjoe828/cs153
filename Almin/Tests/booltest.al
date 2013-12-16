@@ -1,11 +1,10 @@
-
 main{
 VAR:
 	bool x;
 	int i;
 BODY:
 	i = 0;
-	if(foo(i)){
+	if(i==0){
 		printf("Yes!");
 	}
 	else{

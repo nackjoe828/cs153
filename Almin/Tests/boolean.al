@@ -1,4 +1,4 @@
-boolean foo(int x){
+bool foo(int x){
 	if(x == 1){
 		return true;
 	}
@@ -11,8 +11,9 @@ main{
 VAR:
 	bool x;
 	int i;
+	bool[3] bools;
 BODY:
-	i = 0;
+	i = 1;
 	if(foo(i)){
 		printf("Yes!");
 	}
