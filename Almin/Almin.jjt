@@ -80,9 +80,9 @@ public class AlminParser
       ex.printStackTrace();
     }
     
-    // Print the cross-reference table.
-  //  CrossReferencer crossReferencer = new CrossReferencer();
-  //  crossReferencer.print(symTabStack);
+  	 Print the cross-reference table.
+  	 CrossReferencer crossReferencer = new CrossReferencer();
+  	 crossReferencer.print(symTabStack);
 	if (rootNode != null)
 	{
 	  	
