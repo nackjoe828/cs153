@@ -1,6 +1,7 @@
 public class testprintf{
 	public static void main(String[] args){
-        String str =  "hello" + 4;
+        java.util.HashMap<String, Integer> hashint = new java.util.HashMap<String, Integer>();
+        hashint.put("first", 1);
     }
 /*
 	public static String strint(boolean arg2, String arg1){
