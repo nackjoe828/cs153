@@ -1,11 +1,8 @@
-
 main{
 VAR:
 	bool x;
-	int i;
 BODY:
-	i = 0;
-	if(foo(i)){
+	if(x){
 		printf("Yes!");
 	}
 	else{

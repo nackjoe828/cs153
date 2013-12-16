@@ -59,15 +59,15 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
     SimpleNode rootNode = null;
 
     try {
-      rootNode = parser.Program(programName);
+      rootNode = parser.Program();
     }
     catch (ParseException ex) {
       ex.printStackTrace();
     }
 
-    // Print the cross-reference table.
-  //  CrossReferencer crossReferencer = new CrossReferencer();
-  //  crossReferencer.print(symTabStack);
+         //Print the cross-reference table.
+         CrossReferencer crossReferencer = new CrossReferencer();
+         crossReferencer.print(symTabStack);
         if (rootNode != null)
         {
 
@@ -104,12 +104,12 @@ public class AlminParser/*@bgen(jjtree)*/implements AlminParserTreeConstants, Al
 /*****************************************
  * ALMIN GRAMMAR STARTS HERE             *
  *****************************************/
-  static final public SimpleNode Program(String programName) throws ParseException {
+  static final public SimpleNode Program() throws ParseException {
     trace_call("Program");
     try {
   // Set program name; Enter global scope (push on symTabStack)
   SimpleNode rootNode;
-  programId = symTabStack.enterLocal(programName);
+  programId = symTabStack.enterLocal("main");
   programId.setDefinition(DefinitionImpl.PROGRAM);
   symTabStack.setProgramId(programId);
   programId.setAttribute(ROUTINE_SYMTAB, symTabStack.push());
