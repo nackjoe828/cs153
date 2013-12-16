@@ -1,3 +1,5 @@
+
+// computes the factorial of n recursively
 int factrecur(int n){
 VAR:
 	int result;
@@ -10,6 +12,7 @@ BODY:
 	return result;
 }
 
+// computes the factorial of n using a loop
 int factnonrecur(int n){
 VAR:
 	int result;
@@ -24,6 +27,7 @@ BODY:
 	return result;
 }
 
+// the main
 main{
 VAR:
 	int x;
