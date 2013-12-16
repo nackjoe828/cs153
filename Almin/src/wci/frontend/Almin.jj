@@ -235,10 +235,11 @@ SimpleNode Program(String programName)       :
 }
 {
   try {
-    [<TYPE> ":"
-     (TypeDeclaration())*
-     
-     (<VAR> ":"  (VariableDeclaration())*   <FUNC> ":"      | <FUNC> ":")]
+    [
+    	[<TYPE> ":" (TypeDeclaration())*]
+    	[<VAR> ":"  (VariableDeclaration())*]
+    	<FUNC> ":"
+    ]
     rootNode = FunctionDefinitions()
     <EOF>
   } catch (ParseException e) {
@@ -342,8 +343,10 @@ SimpleNode Block() :
   try {
 /*@egen*/
   "{"
-      [<VAR> ":" (VariableDeclaration())*
-      <BODY> ":"]
+      [
+      	[<VAR> ":" (VariableDeclaration())*]
+      	<BODY> ":"
+      ]
       Statements()
   "}"/*@bgen(jjtree)*/
   {

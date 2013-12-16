@@ -231,10 +231,11 @@ SimpleNode Program(String programName) #void :
 }
 {
   try {
-    [<TYPE> ":"
-     (TypeDeclaration())*
-     
-     (<VAR> ":"  (VariableDeclaration())*   <FUNC> ":"      | <FUNC> ":")]
+    [
+    	[<TYPE> ":" (TypeDeclaration())*]
+    	[<VAR> ":"  (VariableDeclaration())*]
+    	<FUNC> ":"
+    ]
     rootNode = FunctionDefinitions()
     <EOF>
   } catch (ParseException e) {
@@ -332,8 +333,10 @@ SimpleNode Block() :
 { SimpleNode rootNode; }
 {
   "{"
-      [<VAR> ":" (VariableDeclaration())*
-      <BODY> ":"]
+      [
+      	[<VAR> ":" (VariableDeclaration())*]
+      	<BODY> ":"
+      ]
       Statements()
   "}"
   { return jjtThis ;}
