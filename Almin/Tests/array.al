@@ -1,13 +1,20 @@
-TYPE:
-	st {
-		int[5] x;
-		int[5] y;
-	}
-FUNC:
+void foo(int x) 
+{
+	printf("x=%d\n",x);
+}
+
 main {
 VAR:
-	st[5] a;
+	int[10] i;
+	int x;
+	int y;
 BODY:
-     a[3].x[1] = 1;
-     a[3].y[1] = 3;
+	x = 0;
+     while(x < 10){
+     	i[x] = x * 10;
+     	y = i[x];
+     	foo(i[x]);
+     	//printf("i[%d]=%d\n",x, y);
+     	x = x + 1;
+     }
 }

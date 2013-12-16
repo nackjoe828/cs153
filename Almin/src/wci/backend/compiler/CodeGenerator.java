@@ -112,6 +112,9 @@ public class CodeGenerator extends Backend
         		else if(type == Predefined.booleanType){
         			typeCode = "Z";
         		}
+        		else{
+        			typeCode = "error";
+        		}
         		strBuf += typeCode;
         	}
         	
@@ -141,6 +144,12 @@ public class CodeGenerator extends Backend
     		else if(retType == Predefined.booleanType){
     			typeCode = "Z";
     		}
+    		else if(retType == Predefined.voidType){
+    			typeCode = "V";
+    		}
+    		else{
+    			typeCode = "error";
+    		}
     		strBuf += typeCode;
     		objectFile.println(strBuf);
     		
@@ -153,6 +162,10 @@ public class CodeGenerator extends Backend
     		SymTab funcTable = (SymTab) currentEntry.getAttribute(ROUTINE_SYMTAB);
     		int localCount = funcTable.sortedEntries().size();
     		
+    		//if return type is void, add return
+    		if(retType == Predefined.voidType){
+    			objectFile.println("    return\n\n");
+    		}
     		
     		
     		objectFile.println(".limit locals " + localCount);
@@ -187,6 +200,7 @@ public class CodeGenerator extends Backend
 			//if record, generate code for record declaration 
 			TypeSpec currentType = currentTabEntry.getTypeSpec();
 			if(currentType.getForm() == TypeFormImpl.RECORD) generateRecord(currentTabEntry);
+			if(currentType.getForm() == TypeFormImpl.ARRAY) generateArray(currentTabEntry);
 			//rec is added in generateRecord method
 			else paramIndexAndEntry.add(currentTabEntry);
     	}
@@ -257,5 +271,24 @@ public class CodeGenerator extends Backend
 				+ " ;record/" + recEntry.getName());
 		CodeGenerator.objectFile.println();
 		paramIndexAndEntry.add(recEntry);
+    }
+    
+    private void generateArray(SymTabEntry arrEntry){
+    	TypeSpec type = arrEntry.getTypeSpec();
+    	int size = (Integer) type.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_COUNT);
+		CodeGenerator.objectFile.println();
+		CodeGenerator.objectFile.println(";generating array/" + arrEntry.getName());
+		CodeGenerator.objectFile.println("    ldc " + size);
+    	TypeSpec elementType = (TypeSpec) type.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
+    	if(elementType == Predefined.integerType){
+    		CodeGenerator.objectFile.println("    newarray int");
+    	}
+    	if(elementType == Predefined.realType){
+    		CodeGenerator.objectFile.println("    newarray float");
+    	}
+		CodeGenerator.objectFile.println("    astore " + paramIndexAndEntry.size() 
+				+ " ;array/" + arrEntry.getName());
+		CodeGenerator.objectFile.println();
+		paramIndexAndEntry.add(arrEntry);
     }
 }
