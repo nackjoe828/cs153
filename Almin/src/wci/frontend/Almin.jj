@@ -281,7 +281,7 @@ SimpleNode ProgramMain()       :
   SimpleNode rootNode;
 }
 {
-  <MAIN> // push new scope for main()
+  <MAIN> ["(" ")"] // push new scope for main()
   {
     SymTabEntry mainID = symTabStack.enterLocal("main");
     mainID.setDefinition(DefinitionImpl.PROCEDURE);
@@ -422,7 +422,7 @@ void Statement()       : {}
 {
   try  {
  	 LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  	 Assignment() ";" | FunctionCall() ";"
+  	 Assignment() ";" | LOOKAHEAD(2) FunctionCall() ";" | Expression() ";"
   	 | ScopedBlock() | ControlStatement() |  ReturnStatement() | ";"
   } catch (ParseException e) {
      javaCodeSkipLine();
@@ -610,7 +610,7 @@ void ReturnStatement() : {/*@bgen(jjtree) ReturnStatement */
 
 void Expression()       : {}
 {
-  StringLiteral() | LOOKAHEAD(2) Assignment() | BooleanExpression()
+  LOOKAHEAD(2) Assignment() | BooleanExpression()
 }
 
 void BooleanExpression()       : {}
@@ -876,6 +876,7 @@ void SimpleExpression()       : {}
 
 void Term()       : {}
 {
+  StringLiteral() |
   Factor() ( "*"/*@bgen(jjtree) #mult( 2) */
                    {
                      ASTmult jjtn001 = new ASTmult(JJTMULT);

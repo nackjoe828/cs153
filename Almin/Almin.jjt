@@ -277,7 +277,7 @@ SimpleNode ProgramMain() #void :
   SimpleNode rootNode;
 }
 {
-  <MAIN> // push new scope for main()
+  <MAIN> ["(" ")"] // push new scope for main()
   {
     SymTabEntry mainID = symTabStack.enterLocal("main");
     mainID.setDefinition(DefinitionImpl.PROCEDURE);
@@ -387,7 +387,7 @@ void Statement() #void : {}
 {
   try  {
  	 LOOKAHEAD(2) // AssignmentStatement and FunctionCall both start with <IDENTIFIER>  
-  	 Assignment() ";" | FunctionCall() ";"
+  	 Assignment() ";" | LOOKAHEAD(2) FunctionCall() ";" | Expression() ";"
   	 | ScopedBlock() | ControlStatement() |  ReturnStatement() | ";"
   } catch (ParseException e) {
      javaCodeSkipLine();
@@ -445,7 +445,7 @@ void ReturnStatement() : {}
 
 void Expression() #void : {}
 {
-  StringLiteral() | LOOKAHEAD(2) Assignment() | BooleanExpression()
+  LOOKAHEAD(2) Assignment() | BooleanExpression()
 }
 
 void BooleanExpression() #void : {}
@@ -468,6 +468,7 @@ void SimpleExpression() #void : {}
 
 void Term() #void : {}
 {
+  StringLiteral() |
   Factor() ( "*"   Factor() #mult(2)
            | "/"   Factor() #div(2)
            | <AND> Factor() #and(2)
