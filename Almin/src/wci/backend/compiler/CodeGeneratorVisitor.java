@@ -61,6 +61,13 @@ public class CodeGeneratorVisitor
         	return data;
         }
         
+        //assigning one record to another
+        if(variableNode.getTypeSpec().getForm() == TypeFormImpl.RECORD
+        		&& expressionNode.getTypeSpec().getForm() == TypeFormImpl.RECORD){
+        	expressionNode.jjtAccept(this, data);
+        	CodeGenerator.objectFile.println("    astore " + slotNumber + " ;" + "record/" + fieldName);
+        	return data;
+        }
         
 
         //if record type, program enters here
@@ -73,6 +80,7 @@ public class CodeGeneratorVisitor
         	
        
         	Node varNode = node.jjtGetChild(0);
+        	if(varNode.jjtGetNumChildren() == 0) return data;
         	SimpleNode childOfField = (SimpleNode) varNode.jjtGetChild(0).jjtGetChild(0);
         	
         	//generate code for field and expression
@@ -165,6 +173,8 @@ public class CodeGeneratorVisitor
         if(type.getForm() == TypeFormImpl.RECORD){
         	CodeGenerator.objectFile.println("    aload " + slotNumber + "  ;" + "Local/" + id.getName());
         	
+        	if(node.jjtGetNumChildren() == 0) return 0;
+        	
         	//get variable node under field
         	SimpleNode varUnderField = (SimpleNode) node.jjtGetChild(0).jjtGetChild(0);
         	id = (SymTabEntry) varUnderField.getAttribute(ID);
@@ -180,7 +190,7 @@ public class CodeGeneratorVisitor
             }
             else if(varType == Predefined.realType){
             	CodeGenerator.objectFile.println("    checkcast      java/lang/Float");
-            	CodeGenerator.objectFile.println("    invokevirtual  java/lang/Float.floatValue()I");
+            	CodeGenerator.objectFile.println("    invokevirtual  java/lang/Float.floatValue()F");
             }
             else typeCode = "not defined yet";
         	
@@ -496,7 +506,10 @@ public class CodeGeneratorVisitor
     		if(currentChildType.getForm() == TypeFormImpl.ARRAY){
     			currentChildType = (TypeSpec) currentChildType.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
     		}
-    		if(currentChildType == Predefined.integerType){
+    		if(currentChildType.getForm() == TypeFormImpl.RECORD){
+    			typeCodes[i] = "Ljava/util/HashMap;";
+    		}
+    		else if(currentChildType == Predefined.integerType){
     			typeCodes[i] = "I";
     		}
     		else if(currentChildType == Predefined.realType){
@@ -516,10 +529,6 @@ public class CodeGeneratorVisitor
     	for(int i = 0; i < argCount; i++){
     		signature += typeCodes[i];
     	}
-    	
-		if(type.getForm() == TypeFormImpl.ARRAY){
-			type = (TypeSpec) type.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
-		}
 
     	//append return type
 		if(type == Predefined.integerType){
@@ -536,6 +545,9 @@ public class CodeGeneratorVisitor
 		}
 		else if(type == Predefined.voidType){
 			typeCode = "V";
+		}
+		else if(type.getForm() == TypeFormImpl.RECORD){
+			typeCode = "Ljava/util/HashMap;";
 		}
 		else typeCode = "error";
     	
@@ -694,6 +706,9 @@ public class CodeGeneratorVisitor
 		}
 		else if(retType == Predefined.booleanType){
 			typeCode = "i";
+		}
+		else if(retType.getForm() == TypeFormImpl.RECORD){
+			typeCode = "a";
 		}
 		//void
 		else

@@ -1,0 +1,2 @@
+x = 10, factrecur(x) = 3628800
+x = 10, factnonrecur(x) = 3628800

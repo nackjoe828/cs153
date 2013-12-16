@@ -100,7 +100,11 @@ public class CodeGenerator extends Backend
         		paramIndexAndEntry.add(param);
         		TypeSpec type = param.getTypeSpec();
         		String typeCode="";
-        		if(type == Predefined.integerType){
+        		//if array, append [
+        		if(type.getForm() == TypeFormImpl.RECORD){
+        			strBuf += "Ljava/util/HashMap;";
+        		}
+        		else if(type == Predefined.integerType){
         			typeCode = "I";
         		}
         		else if(type == Predefined.realType){
@@ -129,10 +133,14 @@ public class CodeGenerator extends Backend
         		}
         	}
         	
+    		String typeCode="";
         	strBuf += ")";
         	TypeSpec retType = currentEntry.getTypeSpec();
-    		String typeCode="";
-    		if(retType == Predefined.integerType){
+    		//if array, append [
+    		if(retType.getForm() == TypeFormImpl.RECORD){
+    			strBuf += "Ljava/util/HashMap;";
+    		}
+    		else if(retType == Predefined.integerType){
     			typeCode = "I";
     		}
     		else if(retType == Predefined.realType){
@@ -248,7 +256,7 @@ public class CodeGenerator extends Backend
 				CodeGenerator.objectFile.println("    invokestatic   java/lang/Integer.valueOf(I)Ljava/lang/Integer;");
 			}
 			else if(fieldType == Predefined.realType){
-				CodeGenerator.objectFile.println("    ldc 0,0");
+				CodeGenerator.objectFile.println("    ldc 0.0");
 				CodeGenerator.objectFile.println("    invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;");
 			}
 			else if(fieldType == Predefined.stringType){
@@ -285,6 +293,9 @@ public class CodeGenerator extends Backend
     	}
     	if(elementType == Predefined.realType){
     		CodeGenerator.objectFile.println("    newarray float");
+    	}
+    	if(elementType == Predefined.realType){
+    		CodeGenerator.objectFile.println("    newarray boolean");
     	}
 		CodeGenerator.objectFile.println("    astore " + paramIndexAndEntry.size() 
 				+ " ;array/" + arrEntry.getName());
