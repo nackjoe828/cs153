@@ -9,6 +9,8 @@ import wci.intermediate.*;
 import wci.backend.compiler.CodeGenerator;
 import wci.intermediate.symtabimpl.Predefined;
 import wci.intermediate.typeimpl.TypeFormImpl;
+import wci.intermediate.typeimpl.TypeKeyImpl;
+import wci.intermediate.typeimpl.TypeSpecImpl;
 import static wci.intermediate.icodeimpl.ICodeKeyImpl.*;
 
 public class CodeGeneratorVisitor
@@ -24,14 +26,50 @@ public class CodeGeneratorVisitor
         SimpleNode expressionNode = (SimpleNode) node.jjtGetChild(1);
         TypeSpec expressionType = expressionNode.getTypeSpec();
         TypeSpec targetType = variableNode.getTypeSpec();
+        
+
+        ArrayList<SymTabEntry> list = CodeGenerator.paramIndexAndEntry;
+        SymTabEntry id = (SymTabEntry) variableNode.getAttribute(ID);
+        int slotNumber = 0;
+        for(SymTabEntry e : list){
+        	if(e == id) break;
+        	slotNumber++;
+        }
+        String fieldName = id.getName();
+        TypeSpec type = id.getTypeSpec();
+        String typeCode;
+        if(type == Predefined.integerType) typeCode = "i";
+        else if(type == Predefined.realType) typeCode = "f";
+        else if(type == Predefined.stringType) typeCode = "a";
+        else if(type.getForm() == TypeFormImpl.RECORD) typeCode = "a";
+        else typeCode = "i";
+        
+        
+        //if array, program enters here.
+        if(variableNode.getTypeSpec().getForm() == TypeFormImpl.ARRAY){
+        	TypeSpec elementType = (TypeSpec) type.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
+        	if(elementType == Predefined.integerType){
+        		typeCode = "i";
+        	}
+        	if(elementType == Predefined.realType){
+        		typeCode = "f";
+        	}
+        	CodeGenerator.objectFile.println("    aload " + slotNumber + " ;" + "array/" + fieldName);
+        	variableNode.jjtGetChild(0).jjtAccept(this, data);
+        	expressionNode.jjtAccept(this, data);
+        	CodeGenerator.objectFile.println("    " + typeCode + "astore " + " ;" + "array/" + fieldName);
+        	return data;
+        }
+        
+        
 
         //if record type, program enters here
         if(variableNode.getTypeSpec().getForm() == TypeFormImpl.RECORD){
         	variableNode.jjtAccept(this, data);
         	expressionNode.jjtAccept(this, data);
         	
-        	/*Node varNode = node.jjtGetChild(0);
-        	SimpleNode childOfField = (SimpleNode) varNode.jjtGetChild(0);
+        	Node varNode = node.jjtGetChild(0);
+        	SimpleNode childOfField = (SimpleNode) varNode.jjtGetChild(0).jjtGetChild(0);
         	TypeSpec fieldChildType = childOfField.getTypeSpec();
             // Convert an integer value to float if necessary.
             if ((fieldChildType == Predefined.realType) &&
@@ -39,14 +77,15 @@ public class CodeGeneratorVisitor
             {
                 CodeGenerator.objectFile.println("    i2f");
                 CodeGenerator.objectFile.flush();
-            }*/
+            }
             
-        	if(expressionType == Predefined.integerType){
+        	if(fieldChildType == Predefined.integerType){
         		CodeGenerator.objectFile.println("    invokestatic   java/lang/Integer.valueOf(I)Ljava/lang/Integer;");
         	}
-        	else if(expressionType == Predefined.realType){
+        	else if(fieldChildType == Predefined.realType){
         		CodeGenerator.objectFile.println("    invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;");
         	}
+        	else{}
         	
         	CodeGenerator.objectFile.println("    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;"
         			+ "Ljava/lang/Object;)Ljava/lang/Object;");
@@ -65,22 +104,6 @@ public class CodeGeneratorVisitor
             CodeGenerator.objectFile.println("    i2f");
             CodeGenerator.objectFile.flush();
         }
-
-        ArrayList<SymTabEntry> list = CodeGenerator.paramIndexAndEntry;
-        SymTabEntry id = (SymTabEntry) variableNode.getAttribute(ID);
-        int slotNumber = 0;
-        for(SymTabEntry e : list){
-        	if(e == id) break;
-        	slotNumber++;
-        }
-        String fieldName = id.getName();
-        TypeSpec type = id.getTypeSpec();
-        String typeCode;
-        if(type == Predefined.integerType) typeCode = "i";
-        else if(type == Predefined.realType) typeCode = "f";
-        else if(type == Predefined.stringType) typeCode = "a";
-        else if(type.getForm() == TypeFormImpl.RECORD) typeCode = "a";
-        else typeCode = "i";
 
         // Emit the appropriate store instruction.
         CodeGenerator.objectFile.println("    " + typeCode + "store " + slotNumber + " ;" + "Local/" + fieldName);
@@ -108,10 +131,23 @@ public class CodeGeneratorVisitor
         TypeSpec type = id.getTypeSpec();
         String typeCode;
         if(type == Predefined.integerType) typeCode = "i";
-        else if(type == Predefined.realType) typeCode = "i";
+        else if(type == Predefined.realType) typeCode = "f";
         else if(type == Predefined.stringType) typeCode = "a";
         else if(type.getForm() == TypeFormImpl.RECORD) typeCode = "a";
         else typeCode = "a";
+        
+        //if array, program goes here
+        if(type.getForm() == TypeFormImpl.ARRAY){
+        	CodeGenerator.objectFile.println("    aload " + slotNumber + "  ;" + "Local/" + id.getName());
+        	TypeSpec elementType = (TypeSpec)type.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
+            if(elementType == Predefined.integerType) typeCode = "i";
+            else if(elementType == Predefined.realType) typeCode = "f";
+            else typeCode = "not defined yet";
+            node.jjtGetChild(0).jjtAccept(this, data);
+            CodeGenerator.objectFile.println("    " + typeCode + "aload ");
+            CodeGenerator.objectFile.flush();
+            return data;
+        }
 
         // Emit the appropriate load instruction.
         //CodeGenerator.objectFile.println("    getstatic " + programName + "/" + fieldName + " " + typeCode);
@@ -124,6 +160,11 @@ public class CodeGeneratorVisitor
         }
 
         return data;
+    }
+    
+    public Object visit(ASTIndex node, Object data){
+    	node.jjtGetChild(0).jjtAccept(this, data);
+    	return data;
     }
     
     public Object visit(ASTField node, Object data){
@@ -412,6 +453,9 @@ public class CodeGeneratorVisitor
     		currentChildNode = (SimpleNode) node.jjtGetChild(i);
     		currentChildNode.jjtAccept(this, data);
     		TypeSpec currentChildType = currentChildNode.getTypeSpec();
+    		if(currentChildType.getForm() == TypeFormImpl.ARRAY){
+    			currentChildType = (TypeSpec) currentChildType.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
+    		}
     		if(currentChildType == Predefined.integerType){
     			typeCodes[i] = "I";
     		}
@@ -432,6 +476,10 @@ public class CodeGeneratorVisitor
     	for(int i = 0; i < argCount; i++){
     		signature += typeCodes[i];
     	}
+    	
+		if(type.getForm() == TypeFormImpl.ARRAY){
+			type = (TypeSpec) type.getAttribute(TypeKeyImpl.ARRAY_ELEMENT_TYPE);
+		}
 
     	//append return type
 		if(type == Predefined.integerType){
@@ -445,6 +493,9 @@ public class CodeGeneratorVisitor
 		}
 		else if(type == Predefined.booleanType){
 			typeCode = "Z";
+		}
+		else if(type == Predefined.voidType){
+			typeCode = "V";
 		}
 		else typeCode = "error";
     	
