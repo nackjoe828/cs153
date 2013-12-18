@@ -58,17 +58,18 @@
     invokevirtual  java/util/HashMap.put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
     pop
     astore 1 ;record/v1
+;done generating record/v1
 
     aload 1 ;record/v1
+    aload 1  ;Local/v1
     ldc "z"
-    ldc "hello%d"
-    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-    pop
+    invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)Ljava/lang/Object;
+    checkcast java/lang/String
     getstatic java/lang/System/out Ljava/io/PrintStream;
     aload 1  ;Local/v1
     ldc "z"
     invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)Ljava/lang/Object;
-    checkcast      java/lang/String
+    checkcast java/lang/String
     ldc 1
     anewarray java/lang/Object
 
@@ -87,6 +88,6 @@
 
     return
 
-.limit locals 4
+.limit locals 16
 .limit stack  16
 .end method

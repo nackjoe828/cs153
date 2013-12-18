@@ -131,6 +131,6 @@ L004:
 
     return
 
-.limit locals 4
+.limit locals 16
 .limit stack  16
 .end method

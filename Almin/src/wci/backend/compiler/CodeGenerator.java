@@ -224,7 +224,9 @@ public class CodeGenerator extends Backend
     	for(SymTabEntry currentTabEntry : tabEntries){
 			//if record, generate code for record declaration 
 			TypeSpec currentType = currentTabEntry.getTypeSpec();
-			if(currentType.getForm() == TypeFormImpl.RECORD) generateRecord(currentTabEntry);
+			if(currentType.getForm() == TypeFormImpl.RECORD){
+				generateRecord(currentTabEntry);
+			}
 			if(currentType.getForm() == TypeFormImpl.ARRAY) generateArray(currentTabEntry);
 			//rec is added in generateRecord method
 			paramIndexAndEntry.add(currentTabEntry);
@@ -282,17 +284,20 @@ public class CodeGenerator extends Backend
 				//CodeGenerator.objectFile.println("    invokenonvirtual java/lang/StringBuilder/<init>(Ljava/lang/String;)V");
 			}
 			//if record
-			/*
+			
 			else{
 				generateRecord(e);
-			}*/
+				//push nested record to the operand stack again
+				CodeGenerator.objectFile.println("    aload " + paramIndexAndEntry.size() + " ;record/" + e.getName());
+				paramIndexAndEntry.add(e);
+			}
 			
 			CodeGenerator.objectFile.println("    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;"
 						+ "Ljava/lang/Object;)Ljava/lang/Object;");
 			CodeGenerator.objectFile.println("    pop");
 		}
-		CodeGenerator.objectFile.println("    astore " + paramIndexAndEntry.size() 
-				+ " ;record/" + recEntry.getName());
+		CodeGenerator.objectFile.println("    astore " + paramIndexAndEntry.size() + " ;record/" + recEntry.getName());
+		CodeGenerator.objectFile.println(";done generating record/" + recEntry.getName());
 		CodeGenerator.objectFile.println();
     }
     

@@ -61,54 +61,72 @@ public class CodeGeneratorVisitor
         	return data;
         }
         
+        /*
         //assigning one record to another
         if(variableNode.getTypeSpec().getForm() == TypeFormImpl.RECORD
         		&& expressionNode.getTypeSpec().getForm() == TypeFormImpl.RECORD){
         	expressionNode.jjtAccept(this, data);
         	CodeGenerator.objectFile.println("    astore " + slotNumber + " ;" + "record/" + fieldName);
         	return data;
-        }
+        }*/
         
-
         //if record type, program enters here
         if(variableNode.getTypeSpec().getForm() == TypeFormImpl.RECORD){
         	//variableNode.jjtAccept(this, data);
         	//expressionNode.jjtAccept(this, data);
         	
         	//load record type
+        	//CodeGenerator.objectFile.println("    aload " + slotNumber + " ;" + "record/" + fieldName);
+        	
+        	//if function is returning record, record variable does not have child
+        	if(variableNode.jjtGetNumChildren() == 0) return data;
+        	
+        	SimpleNode childOfField = (SimpleNode) variableNode.jjtGetChild(0).jjtGetChild(0);
+        	TypeSpec childType = childOfField.getTypeSpec();
+        	
+        	//for nested record type
+        	while(childType.getForm() == TypeFormImpl.RECORD){
+        		id = (SymTabEntry) childOfField.getAttribute(ID);
+        		childOfField = (SimpleNode) childOfField.jjtGetChild(0).jjtGetChild(0);
+        		childType = childOfField.getTypeSpec();
+        	}
+        	
+        	slotNumber = 0;
+        	for(SymTabEntry e : list){
+            	if(e == id) break;
+            	slotNumber++;
+            }
+        	fieldName = id.getName();
+        	//load record type
         	CodeGenerator.objectFile.println("    aload " + slotNumber + " ;" + "record/" + fieldName);
+        	CodeGenerator.objectFile.println("    dup");
         	
-       
-        	Node varNode = node.jjtGetChild(0);
-        	if(varNode.jjtGetNumChildren() == 0) return data;
-        	SimpleNode childOfField = (SimpleNode) varNode.jjtGetChild(0).jjtGetChild(0);
         	
-        	//generate code for field and expression
-        	SymTabEntry fieldEntry= (SymTabEntry) childOfField.getAttribute(ID);
-        	CodeGenerator.objectFile.println("    ldc \"" + fieldEntry.getName() + "\"");
-        	//variableNode.jjtAccept(this, data);
+        	//get field name
+        	id = (SymTabEntry) childOfField.getAttribute(ID);
+        	fieldName = id.getName();
+        	CodeGenerator.objectFile.println("    ldc \"" + fieldName + "\"");
         	expressionNode.jjtAccept(this, data);
         	
-        	TypeSpec fieldChildType = childOfField.getTypeSpec();
-            // Convert an integer value to float if necessary.
-            if ((fieldChildType == Predefined.realType) &&
-                (expressionType == Predefined.integerType))
-            {
-                CodeGenerator.objectFile.println("    i2f");
-                CodeGenerator.objectFile.flush();
-            }
-            
-        	if(fieldChildType == Predefined.integerType){
+        	//if record, step down to get type
+        	if(expressionType.getForm() == TypeFormImpl.RECORD){
+        		expressionType = childType;
+        	}
+        	
+        	if(expressionType == Predefined.integerType){
         		CodeGenerator.objectFile.println("    invokestatic   java/lang/Integer.valueOf(I)Ljava/lang/Integer;");
         	}
-        	else if(fieldChildType == Predefined.realType){
+        	else if(expressionType == Predefined.realType){
         		CodeGenerator.objectFile.println("    invokestatic   java/lang/Float.valueOf(F)Ljava/lang/Float;");
         	}
-        	else{}
-        	
+        	else{
+        		
+        	}
         	CodeGenerator.objectFile.println("    invokevirtual  java/util/HashMap.put(Ljava/lang/Object;"
         			+ "Ljava/lang/Object;)Ljava/lang/Object;");
         	CodeGenerator.objectFile.println("    pop");
+        	
+        	
         	return data;
         }
         	
@@ -171,33 +189,30 @@ public class CodeGeneratorVisitor
         
         //if record, program goes here
         if(type.getForm() == TypeFormImpl.RECORD){
-        	CodeGenerator.objectFile.println("    aload " + slotNumber + "  ;" + "Local/" + id.getName());
+        	if(node.jjtGetNumChildren() == 0)return data;
+        	SimpleNode childOfField = (SimpleNode) node.jjtGetChild(0).jjtGetChild(0);
+        	TypeSpec childType = childOfField.getTypeSpec();
+        	SimpleNode currentNode = childOfField;
         	
-        	if(node.jjtGetNumChildren() == 0) return 0;
+        	//for nested record type
+        	while(childType.getForm() == TypeFormImpl.RECORD){
+        		id = (SymTabEntry) childOfField.getAttribute(ID);
+        		currentNode = childOfField;
+        		childOfField = (SimpleNode) childOfField.jjtGetChild(0).jjtGetChild(0);
+        		childType = childOfField.getTypeSpec();
+        	}
         	
-        	//get variable node under field
-        	SimpleNode varUnderField = (SimpleNode) node.jjtGetChild(0).jjtGetChild(0);
-        	id = (SymTabEntry) varUnderField.getAttribute(ID);
-        	CodeGenerator.objectFile.println("    ldc \"" + id.getName() + "\"");
-        	
-        	//get value
-        	CodeGenerator.objectFile.println("    invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)"
-        			+ "Ljava/lang/Object;");
-        	TypeSpec varType = varUnderField.getTypeSpec();
-            if(varType == Predefined.integerType){
-            	CodeGenerator.objectFile.println("    checkcast      java/lang/Integer");
-            	CodeGenerator.objectFile.println("    invokevirtual  java/lang/Integer.intValue()I");
+        	slotNumber = 0;
+        	for(SymTabEntry e : list){
+            	if(e == id) break;
+            	slotNumber++;
             }
-            else if(varType == Predefined.realType){
-            	CodeGenerator.objectFile.println("    checkcast      java/lang/Float");
-            	CodeGenerator.objectFile.println("    invokevirtual  java/lang/Float.floatValue()F");
-            }
-            else if(varType == Predefined.stringType){
-            	CodeGenerator.objectFile.println("    checkcast      java/lang/String");
-            }
-            else typeCode = "not defined yet";
+        	String fieldName = id.getName();
         	
+        	CodeGenerator.objectFile.println("    aload " + slotNumber + " ;Record/" + fieldName);
         	
+        	currentNode.jjtGetChild(0).jjtAccept(this, data);
+
         	return data;
         	
         }
@@ -216,7 +231,30 @@ public class CodeGeneratorVisitor
     }
     
     public Object visit(ASTField node, Object data){
-    	node.jjtGetChild(0).jjtAccept(this, data);
+    	//get variable node under field
+    	SimpleNode varUnderField = (SimpleNode) node.jjtGetChild(0);
+    	SymTabEntry id = (SymTabEntry) varUnderField.getAttribute(ID);
+    	CodeGenerator.objectFile.println("    ldc \"" + id.getName() + "\"");
+    	
+    	//get value
+    	CodeGenerator.objectFile.println("    invokevirtual  java/util/HashMap.get(Ljava/lang/Object;)"
+    			+ "Ljava/lang/Object;");
+    	TypeSpec varType = varUnderField.getTypeSpec();
+        if(varType == Predefined.integerType){
+        	CodeGenerator.objectFile.println("    checkcast java/lang/Integer");
+        	CodeGenerator.objectFile.println("    invokevirtual java/lang/Integer.intValue()I");
+        }
+        else if(varType == Predefined.realType){
+        	CodeGenerator.objectFile.println("    checkcast java/lang/Float");
+        	CodeGenerator.objectFile.println("    invokevirtual java/lang/Float.floatValue()F");
+        }
+        else if(varType == Predefined.stringType){
+        	CodeGenerator.objectFile.println("    checkcast java/lang/String");
+        }
+        else {
+        	
+        }
+
     	return data;
     }
 
